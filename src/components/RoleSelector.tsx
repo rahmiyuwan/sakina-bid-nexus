@@ -24,13 +24,6 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
       icon: Building2,
       features: ['View travel requests', 'Submit competitive bids', 'Manage offerings'],
     },
-    {
-      id: 'ADMIN' as UserRole,
-      title: 'Administrator',
-      description: 'Oversee platform operations and manage all users',
-      icon: Shield,
-      features: ['Manage all requests', 'Set pricing margins', 'Platform analytics'],
-    },
   ];
 
   return (
@@ -52,7 +45,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {roles.map((role) => (
             <Card key={role.id} className="relative group hover:shadow-strong transition-all duration-300 transform hover:-translate-y-2">
               <CardHeader className="text-center pb-4">
