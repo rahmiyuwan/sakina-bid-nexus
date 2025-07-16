@@ -13,14 +13,14 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
     {
       id: 'TRAVEL' as UserRole,
       title: 'Travel Agency',
-      description: 'Submit hotel requests and manage bookings for your clients',
+      description: 'Request a hotel acommodation with the best price',
       icon: User,
       features: ['Submit hotel requests', 'View and compare offerings', 'Confirm bookings'],
     },
     {
       id: 'PROVIDER' as UserRole,
       title: 'Hotel Provider',
-      description: 'Bid on travel requests and manage your hotel offerings',
+      description: 'Serve pilgrims with the best offering',
       icon: Building2,
       features: ['View travel requests', 'Submit competitive bids', 'Manage offerings'],
     },
