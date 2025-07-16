@@ -25,7 +25,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <img 
-              src="/lovable-uploads/333ba22d-65d1-4290-9168-26075094b200.png" 
+              src="/lovable-uploads/95c3f4e4-7f9b-449a-8ae0-73e435c9e2ee.png" 
               alt="SAKINA" 
               className="h-10 w-10 object-contain"
             />
