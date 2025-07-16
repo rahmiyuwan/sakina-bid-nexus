@@ -1,13 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React from 'react';
+import { AppProvider, useApp } from '@/contexts/AppContext';
+import RoleSelector from '@/components/RoleSelector';
+import DashboardLayout from '@/components/Dashboard/DashboardLayout';
+import { User, UserRole } from '@/types';
+
+const AppContent: React.FC = () => {
+  const { currentUser, setCurrentUser } = useApp();
+
+  const handleRoleSelect = (role: UserRole) => {
+    // Simulate user creation - in real app this would be handled by OAuth/backend
+    const mockUser: User = {
+      id: Math.random().toString(36).substr(2, 9),
+      email: `user@${role.toLowerCase()}.com`,
+      name: `${role} User`,
+      role: role,
+      createdAt: new Date().toISOString(),
+    };
+    setCurrentUser(mockUser);
+  };
+
+  if (!currentUser) {
+    return <RoleSelector onRoleSelect={handleRoleSelect} />;
+  }
+
+  return <DashboardLayout />;
+};
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   );
 };
 

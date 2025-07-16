@@ -2,41 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* SAKINA Hotel Bidding Platform Design System
+   Navy blue and gold professional hospitality theme
+   All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* SAKINA Brand Colors */
+    --background: 0 0% 98%;
+    --foreground: 210 40% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 8%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Navy Blue Primary - from SAKINA logo */
+    --primary: 210 73% 16%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 210 60% 25%;
+    --primary-dark: 210 85% 12%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Gold Secondary - from SAKINA logo accent */
+    --secondary: 38 45% 50%;
+    --secondary-foreground: 210 40% 8%;
+    --secondary-light: 38 55% 65%;
+    --secondary-dark: 38 35% 35%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 15% 95%;
+    --muted-foreground: 210 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 38 45% 50%;
+    --accent-foreground: 210 40% 8%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 210 73% 16%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* SAKINA Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-light)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 50%, hsl(var(--secondary-dark)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(210 15% 97%) 100%);
+
+    /* SAKINA Shadows */
+    --shadow-soft: 0 4px 12px hsl(var(--primary) / 0.1);
+    --shadow-medium: 0 8px 25px hsl(var(--primary) / 0.15);
+    --shadow-strong: 0 15px 35px hsl(var(--primary) / 0.2);
+    --shadow-gold: 0 8px 25px hsl(var(--secondary) / 0.2);
+
+    /* Animation Variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,41 +80,62 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - SAKINA Professional Theme */
+    --background: 210 85% 8%;
+    --foreground: 210 40% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 210 75% 12%;
+    --card-foreground: 210 40% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 210 75% 12%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Dark Navy Primary */
+    --primary: 210 60% 85%;
+    --primary-foreground: 210 85% 8%;
+    --primary-light: 210 50% 75%;
+    --primary-dark: 210 90% 6%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Dark Gold Secondary */
+    --secondary: 38 65% 65%;
+    --secondary-foreground: 210 85% 8%;
+    --secondary-light: 38 75% 75%;
+    --secondary-dark: 38 45% 45%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 210 30% 18%;
+    --muted-foreground: 210 20% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 38 65% 65%;
+    --accent-foreground: 210 85% 8%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 210 25% 22%;
+    --input: 210 25% 22%;
+    --ring: 210 60% 85%;
+
+    /* Dark Mode Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary-dark)), hsl(var(--primary)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary-dark)), hsl(var(--secondary)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary-dark)) 0%, hsl(var(--background)) 50%, hsl(var(--secondary-dark)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(210 60% 15%) 100%);
+
+    /* Dark Mode Shadows */
+    --shadow-soft: 0 4px 12px hsl(0 0% 0% / 0.3);
+    --shadow-medium: 0 8px 25px hsl(0 0% 0% / 0.4);
+    --shadow-strong: 0 15px 35px hsl(0 0% 0% / 0.5);
+    --shadow-gold: 0 8px 25px hsl(var(--secondary) / 0.3);
+
+    /* Sidebar Colors */
+    --sidebar-background: 210 85% 8%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 210 60% 85%;
+    --sidebar-primary-foreground: 210 85% 8%;
+    --sidebar-accent: 210 30% 18%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 210 25% 22%;
+    --sidebar-ring: 210 60% 85%;
   }
 }
 
