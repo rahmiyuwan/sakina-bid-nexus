@@ -32,7 +32,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
             <img 
-              src="/lovable-uploads/95c3f4e4-7f9b-449a-8ae0-73e435c9e2ee.png" 
+              src="/lovable-uploads/4ce371b9-ed76-4091-8fcd-7a0661911651.png" 
               alt="SAKINA Logo" 
               className="h-20 w-20 object-contain"
             />
