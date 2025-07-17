@@ -27,7 +27,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-6xl">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
@@ -37,10 +37,10 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
               className="h-20 w-20 object-contain"
             />
           </div>
-          <h1 className="text-4xl font-bold text-primary-foreground mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Welcome to SAKINA
           </h1>
-          <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Professional hotel bidding platform connecting travel agencies with hotel providers
           </p>
         </div>
@@ -86,7 +86,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-primary-foreground/60 text-sm">
+          <p className="text-muted-foreground text-sm">
             Select your role to access the SAKINA platform
           </p>
         </div>
