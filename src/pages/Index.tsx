@@ -1,11 +1,11 @@
 import React from 'react';
-import { AppProvider, useApp } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContext';
 import RoleSelector from '@/components/RoleSelector';
 import DashboardLayout from '@/components/Dashboard/DashboardLayout';
-import { User, UserRole } from '@/types';
+import { UserRole } from '@/types';
 
-const AppContent: React.FC = () => {
-  const { currentUser, setCurrentUser } = useApp();
+const Index: React.FC = () => {
+  const { currentUser } = useApp();
 
   const handleRoleSelect = (role: UserRole) => {
     // Navigate to register page with selected role
@@ -17,14 +17,6 @@ const AppContent: React.FC = () => {
   }
 
   return <DashboardLayout />;
-};
-
-const Index = () => {
-  return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
-  );
 };
 
 export default Index;
