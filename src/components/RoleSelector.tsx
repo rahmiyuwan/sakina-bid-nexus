@@ -86,9 +86,16 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onRoleSelect }) => {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm mb-4">
             Select your role to access the SAKINA platform
           </p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.href = '/login'}
+            className="mt-4"
+          >
+            Already have an account? Login
+          </Button>
         </div>
       </div>
     </div>
