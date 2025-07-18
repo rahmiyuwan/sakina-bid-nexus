@@ -307,17 +307,14 @@ const RequestDetail: React.FC = () => {
               </Card>
             )}
 
-            {!canSubmitOffer && !hasExistingOffer() && (
+            {!canSubmitOffer && !hasExistingOffer() && currentProfile?.role === 'hotel_provider' && (
               <Card className="border-2 border-muted">
                 <CardHeader>
                   <CardTitle className="text-muted-foreground">Offering Closed</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    {currentProfile?.role !== 'hotel_provider' 
-                      ? 'Only hotel providers can submit offers.'
-                      : 'This request is no longer accepting offers.'
-                    }
+                    This request is no longer accepting offers.
                   </p>
                 </CardContent>
               </Card>
