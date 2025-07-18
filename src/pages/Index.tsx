@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
-import DashboardLayout from '@/components/Dashboard/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageLoadingSpinner } from '@/components/Common/LoadingStates';
 
 const Index: React.FC = () => {
   const { currentUser, loading } = useApp();
   const navigate = useNavigate();
 
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (currentUser && !loading) {
+      navigate('/dashboard');
+    }
+  }, [currentUser, loading, navigate]);
+
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Loading...</div>
-      </div>
-    );
+    return <PageLoadingSpinner message="Initializing SAKINA..." />;
   }
 
   if (!currentUser) {
@@ -40,7 +43,8 @@ const Index: React.FC = () => {
     );
   }
 
-  return <DashboardLayout />;
+  // This will be handled by the useEffect redirect
+  return null;
 };
 
 export default Index;
