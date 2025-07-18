@@ -12,10 +12,14 @@ import { ArrowLeft } from 'lucide-react';
 
 const NewRequest: React.FC = () => {
   const navigate = useNavigate();
-  const { currentProfile, addRequest } = useApp();
+  const { currentProfile, addRequest, workspaces } = useApp();
   const [loading, setLoading] = useState(false);
+  
+  // Get workspace name for auto-filling travel name
+  const userWorkspace = workspaces.find(w => w.id === currentProfile?.workspace_id);
+  
   const [formData, setFormData] = useState({
-    travel_name: '',
+    travel_name: userWorkspace?.name || '',
     tour_leader: '',
     pax: '',
     city: '',
@@ -27,6 +31,16 @@ const NewRequest: React.FC = () => {
     room_quad: '0',
     room_quint: '0',
   });
+
+  // Update travel_name when workspace data is loaded
+  React.useEffect(() => {
+    if (userWorkspace?.name && !formData.travel_name) {
+      setFormData(prev => ({
+        ...prev,
+        travel_name: userWorkspace.name
+      }));
+    }
+  }, [userWorkspace?.name, formData.travel_name]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
