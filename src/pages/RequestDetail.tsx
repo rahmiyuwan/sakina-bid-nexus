@@ -14,7 +14,7 @@ import { HotelOffering } from '@/types';
 const RequestDetail: React.FC = () => {
   const { requestId } = useParams<{ requestId: string }>();
   const navigate = useNavigate();
-  const { requests, currentUser, currentProfile, addOffering, offerings, hotels } = useApp();
+  const { requests, currentUser, currentProfile, addOffering, offerings, hotels, confirmOffering } = useApp();
   
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerData, setOfferData] = useState({
@@ -211,10 +211,9 @@ const RequestDetail: React.FC = () => {
                             <Button 
                               size="sm" 
                               className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                              onClick={() => {
-                                // TODO: Implement accept offering functionality
-                                console.log('Accept offering:', offering.id);
-                              }}
+                               onClick={() => {
+                                 confirmOffering(offering.id, requestId!);
+                               }}
                             >
                               Accept Offer
                             </Button>
