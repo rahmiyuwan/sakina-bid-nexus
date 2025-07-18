@@ -329,22 +329,40 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const confirmOffering = (offeringId: string, requestId: string) => {
-    // Update selected offering to CONFIRMED
-    setOfferings(prev => prev.map(offering => 
-      offering.id === offeringId 
-        ? { ...offering, status: 'CONFIRMED' as OfferingStatus }
-        : offering.request_id === requestId 
-          ? { ...offering, status: 'CANCELED' as OfferingStatus }
-          : offering
-    ));
+  const confirmOffering = async (offeringId: string, requestId: string) => {
+    try {
+      const { offeringService } = await import('@/services/offeringService');
+      
+      // Update selected offering to CONFIRMED
+      await offeringService.update(offeringId, { status: 'CONFIRMED' });
+      
+      // Cancel other offerings for the same request
+      const otherOfferings = offerings.filter(o => o.request_id === requestId && o.id !== offeringId);
+      await Promise.all(
+        otherOfferings.map(offering => 
+          offeringService.update(offering.id, { status: 'CANCELED' })
+        )
+      );
 
-    // Update request status to CONFIRMED
-    setRequests(prev => prev.map(request => 
-      request.id === requestId 
-        ? { ...request, status: 'Confirmed' as const }
-        : request
-    ));
+      // Update local state
+      setOfferings(prev => prev.map(offering => 
+        offering.id === offeringId 
+          ? { ...offering, status: 'CONFIRMED' as OfferingStatus }
+          : offering.request_id === requestId 
+            ? { ...offering, status: 'CANCELED' as OfferingStatus }
+            : offering
+      ));
+
+      // Update request status to CONFIRMED
+      setRequests(prev => prev.map(request => 
+        request.id === requestId 
+          ? { ...request, status: 'Confirmed' as const }
+          : request
+      ));
+    } catch (error) {
+      console.error('Error confirming offering:', error);
+      throw error;
+    }
   };
 
   const updateOfferingMargin = (offeringId: string, margin: number) => {
