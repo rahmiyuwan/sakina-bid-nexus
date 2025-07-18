@@ -15,8 +15,37 @@ const Profile: React.FC = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState(currentProfile?.full_name || '');
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   const userWorkspace = workspaces.find(workspace => workspace.id === currentProfile?.workspace_id);
+
+  const handleUpdateProfile = async () => {
+    if (!currentProfile?.id) return;
+
+    try {
+      setIsUpdatingProfile(true);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: fullName })
+        .eq('id', currentProfile.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile Updated",
+        description: "Your full name has been successfully updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
 
   const handlePasswordChange = async () => {
     if (!newPassword || newPassword.length < 6) {
@@ -115,12 +144,21 @@ const Profile: React.FC = () => {
               
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  value={currentProfile?.full_name || ''}
-                  disabled
-                  className="bg-muted"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                  />
+                  <Button 
+                    onClick={handleUpdateProfile}
+                    disabled={isUpdatingProfile || fullName === currentProfile?.full_name}
+                    size="sm"
+                  >
+                    {isUpdatingProfile ? 'Saving...' : 'Save'}
+                  </Button>
+                </div>
               </div>
               
               <div className="grid gap-2">
