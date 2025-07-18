@@ -139,47 +139,39 @@ const RequestDetail: React.FC = () => {
                         </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        {request.roomDb > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Double ({request.roomDb} rooms):</span>
-                            <span className="font-medium text-foreground">
-                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                ? `${offering.final_price_double} SAR/night` 
-                                : `${offering.price_double} SAR/night`}
-                            </span>
-                          </div>
-                        )}
-                        {request.roomTp > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Triple ({request.roomTp} rooms):</span>
-                            <span className="font-medium text-foreground">
-                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                ? `${offering.final_price_triple} SAR/night` 
-                                : `${offering.price_triple} SAR/night`}
-                            </span>
-                          </div>
-                        )}
-                        {request.roomQd > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Quad ({request.roomQd} rooms):</span>
-                            <span className="font-medium text-foreground">
-                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                ? `${offering.final_price_quad} SAR/night` 
-                                : `${offering.price_quad} SAR/night`}
-                            </span>
-                          </div>
-                        )}
-                        {request.roomQt > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Quint ({request.roomQt} rooms):</span>
-                            <span className="font-medium text-foreground">
-                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                ? `${offering.final_price_quint} SAR/night` 
-                                : `${offering.price_quint} SAR/night`}
-                            </span>
-                          </div>
-                        )}
+                       <div className="grid grid-cols-2 gap-4 text-sm">
+                         {request.roomDb > 0 && (
+                           <div className="flex justify-between">
+                             <span className="text-muted-foreground">Double ({request.roomDb} rooms):</span>
+                             <span className="font-medium text-foreground">
+                               {offering.final_price_double} SAR/night
+                             </span>
+                           </div>
+                         )}
+                         {request.roomTp > 0 && (
+                           <div className="flex justify-between">
+                             <span className="text-muted-foreground">Triple ({request.roomTp} rooms):</span>
+                             <span className="font-medium text-foreground">
+                               {offering.final_price_triple} SAR/night
+                             </span>
+                           </div>
+                         )}
+                         {request.roomQd > 0 && (
+                           <div className="flex justify-between">
+                             <span className="text-muted-foreground">Quad ({request.roomQd} rooms):</span>
+                             <span className="font-medium text-foreground">
+                               {offering.final_price_quad} SAR/night
+                             </span>
+                           </div>
+                         )}
+                         {request.roomQt > 0 && (
+                           <div className="flex justify-between">
+                             <span className="text-muted-foreground">Quint ({request.roomQt} rooms):</span>
+                             <span className="font-medium text-foreground">
+                               {offering.final_price_quint} SAR/night
+                             </span>
+                           </div>
+                         )}
                        </div>
                        
                        {/* Total Expense Estimation */}
@@ -192,18 +184,10 @@ const RequestDetail: React.FC = () => {
                              const numberOfNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
                              
                              const totalCost = 
-                               (request.roomDb * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                 ? offering.final_price_double 
-                                 : offering.price_double) * numberOfNights) +
-                               (request.roomTp * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                 ? offering.final_price_triple 
-                                 : offering.price_triple) * numberOfNights) +
-                               (request.roomQd * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                 ? offering.final_price_quad 
-                                 : offering.price_quad) * numberOfNights) +
-                               (request.roomQt * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
-                                 ? offering.final_price_quint 
-                                 : offering.price_quint) * numberOfNights);
+                               (request.roomDb * offering.final_price_double * numberOfNights) +
+                               (request.roomTp * offering.final_price_triple * numberOfNights) +
+                               (request.roomQd * offering.final_price_quad * numberOfNights) +
+                               (request.roomQt * offering.final_price_quint * numberOfNights);
                              
                              return `${totalCost.toFixed(2)} SAR`;
                            })()}
