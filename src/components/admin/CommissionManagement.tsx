@@ -2,287 +2,221 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
 import { commissionService } from '@/services/commissionService';
-import { requestService } from '@/services/requestService';
-import type { Commission, CreateCommission, UpdateCommission, Request, User } from '@/types/database';
+import { offeringService } from '@/services/offeringService';
+import type { HotelOffering, HotelRequest } from '@/types/index';
 
 const CommissionManagement: React.FC = () => {
-  const { commissions, requests, users, refreshCommissions } = useApp();
+  const { requests, workspaces } = useApp();
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingCommission, setEditingCommission] = useState<Commission | null>(null);
-  const [formData, setFormData] = useState<CreateCommission>({
-    request_id: '',
-    admin_id: '',
-    commission_double: 0,
-    commission_triple: 0,
-    commission_quad: 0,
-    commission_quint: 0,
-  });
+  const [offerings, setOfferings] = useState<HotelOffering[]>([]);
+  const [editingMargin, setEditingMargin] = useState<{requestId: string, margin: number} | null>(null);
+  const [marginValue, setMarginValue] = useState(0);
   const { toast } = useToast();
 
-  const admins = users.filter(u => u.role === 'admin' || u.role === 'super_admin');
-
   useEffect(() => {
-    refreshCommissions();
+    loadOfferings();
   }, []);
 
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const loadOfferings = async () => {
     try {
-      if (editingCommission) {
-        await commissionService.update(editingCommission.id, formData);
-        toast({
-          title: "Success",
-          description: "Commission updated successfully"
-        });
-      } else {
-        await commissionService.create(formData);
-        toast({
-          title: "Success",
-          description: "Commission created successfully"
-        });
-      }
-      setDialogOpen(false);
-      setEditingCommission(null);
-      refreshCommissions();
+      setLoading(true);
+      const data = await offeringService.getAll();
+      setOfferings(data);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save commission",
+        description: "Failed to load offerings",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEdit = (commission: Commission) => {
-    setEditingCommission(commission);
-    setFormData({
-      request_id: commission.request_id,
-      admin_id: commission.admin_id,
-      commission_double: commission.commission_double || 0,
-      commission_triple: commission.commission_triple || 0,
-      commission_quad: commission.commission_quad || 0,
-      commission_quint: commission.commission_quint || 0
-    });
+
+  const handleEditMargin = (requestId: string, currentMargin: number) => {
+    setEditingMargin({ requestId, margin: currentMargin });
+    setMarginValue(currentMargin);
     setDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this commission?')) return;
+  const handleSaveMargin = async () => {
+    if (!editingMargin) return;
     
     try {
-      await commissionService.delete(id);
+      // Update all offerings for this request with the new margin
+      const requestOfferings = offerings.filter(o => o.request_id === editingMargin.requestId);
+      
+      for (const offering of requestOfferings) {
+        await offeringService.update(offering.id, { admin_margin: marginValue });
+      }
+      
       toast({
         title: "Success",
-        description: "Commission deleted successfully"
+        description: "Margin updated successfully"
       });
-      refreshCommissions();
+      
+      setDialogOpen(false);
+      setEditingMargin(null);
+      loadOfferings();
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete commission",
+        description: "Failed to update margin",
         variant: "destructive"
       });
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      request_id: '',
-      admin_id: '',
-      commission_double: 0,
-      commission_triple: 0,
-      commission_quad: 0,
-      commission_quint: 0
+  const calculateCommissionData = () => {
+    const commissionData: any[] = [];
+    
+    // Group offerings by request
+    const offeringsByRequest = offerings.reduce((acc, offering) => {
+      if (!acc[offering.request_id]) {
+        acc[offering.request_id] = [];
+      }
+      acc[offering.request_id].push(offering);
+      return acc;
+    }, {} as Record<string, HotelOffering[]>);
+
+    Object.entries(offeringsByRequest).forEach(([requestId, requestOfferings]) => {
+      const request = requests.find(r => r.id === requestId);
+      const workspace = workspaces.find(w => w.id === request?.travelUserId); // HotelRequest uses travelUserId
+      
+      if (!request || requestOfferings.length === 0) return;
+
+      // Calculate totals for each offering in this request
+      requestOfferings.forEach(offering => {
+        const margin = offering.admin_margin || 0;
+        
+        // Calculate offer (total of required rooms * price)
+        const offerTotal = 
+          (request.roomDb * (offering.price_double || 0)) +
+          (request.roomTp * (offering.price_triple || 0)) +
+          (request.roomQd * (offering.price_quad || 0)) +
+          (request.roomQt * (offering.price_quint || 0));
+        
+        // Calculate final (total of required rooms * (price + margin))
+        const finalTotal = 
+          (request.roomDb * ((offering.price_double || 0) + margin)) +
+          (request.roomTp * ((offering.price_triple || 0) + margin)) +
+          (request.roomQd * ((offering.price_quad || 0) + margin)) +
+          (request.roomQt * ((offering.price_quint || 0) + margin));
+        
+        // Commission is final - offer
+        const totalCommission = finalTotal - offerTotal;
+
+        // For request number, we'll use the id's last part since HotelRequest doesn't have request_number
+        const requestNumber = request.id.slice(-6);
+
+        commissionData.push({
+          requestNumber,
+          workspace: workspace?.name || 'Unknown',
+          pax: request.paxCount,
+          offer: offerTotal,
+          final: finalTotal,
+          totalCommission,
+          requestId: request.id,
+          margin,
+          hotelName: offering.hotel_name
+        });
+      });
     });
-    setEditingCommission(null);
+
+    return commissionData;
   };
 
-  if (loading || !commissions) {
+  if (loading) {
     return <div>Loading commissions...</div>;
   }
+
+  const commissionData = calculateCommissionData();
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Commission Management</h2>
-        <Dialog open={dialogOpen} onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) resetForm();
-        }}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingCommission ? 'Edit Commission' : 'Create Commission'}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="request_id">Request</Label>
-                <Select value={formData.request_id} onValueChange={(value) => setFormData({ ...formData, request_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select request" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {requests.map((request) => (
-                      <SelectItem key={request.id} value={request.id}>
-                        #{request.id.slice(-6)} - {request.travelName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="admin_id">Admin</Label>
-                <Select value={formData.admin_id} onValueChange={(value) => setFormData({ ...formData, admin_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select admin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {admins.map((admin) => (
-                      <SelectItem key={admin.id} value={admin.id}>
-                        {admin.full_name} ({admin.username})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="commission_double">Double Room Commission</Label>
-                  <div className="flex">
-                    <Input
-                      id="commission_double"
-                      type="number"
-                      step="0.01"
-                      value={formData.commission_double}
-                      onChange={(e) => setFormData({ ...formData, commission_double: parseFloat(e.target.value) || 0 })}
-                      className="rounded-r-none"
-                    />
-                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
-                      SAR
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="commission_triple">Triple Room Commission</Label>
-                  <div className="flex">
-                    <Input
-                      id="commission_triple"
-                      type="number"
-                      step="0.01"
-                      value={formData.commission_triple}
-                      onChange={(e) => setFormData({ ...formData, commission_triple: parseFloat(e.target.value) || 0 })}
-                      className="rounded-r-none"
-                    />
-                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
-                      SAR
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="commission_quad">Quad Room Commission</Label>
-                  <div className="flex">
-                    <Input
-                      id="commission_quad"
-                      type="number"
-                      step="0.01"
-                      value={formData.commission_quad}
-                      onChange={(e) => setFormData({ ...formData, commission_quad: parseFloat(e.target.value) || 0 })}
-                      className="rounded-r-none"
-                    />
-                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
-                      SAR
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="commission_quint">Quint Room Commission</Label>
-                  <div className="flex">
-                    <Input
-                      id="commission_quint"
-                      type="number"
-                      step="0.01"
-                      value={formData.commission_quint}
-                      onChange={(e) => setFormData({ ...formData, commission_quint: parseFloat(e.target.value) || 0 })}
-                      className="rounded-r-none"
-                    />
-                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
-                      SAR
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <Button type="submit" className="w-full">
-                {editingCommission ? 'Update' : 'Create'} Commission
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Margin</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="margin">Margin per Room (SAR)</Label>
+              <div className="flex">
+                <Input
+                  id="margin"
+                  type="number"
+                  step="0.01"
+                  value={marginValue}
+                  onChange={(e) => setMarginValue(parseFloat(e.target.value) || 0)}
+                  className="rounded-r-none"
+                />
+                <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
+                  SAR
+                </span>
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleSaveMargin} className="flex-1">
+                Save Margin
+              </Button>
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
-          <CardTitle>Commissions</CardTitle>
+          <CardTitle>Commission Overview</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Request</TableHead>
-                <TableHead>Admin</TableHead>
-                <TableHead>Double</TableHead>
-                <TableHead>Triple</TableHead>
-                <TableHead>Quad</TableHead>
-                <TableHead>Quint</TableHead>
-                <TableHead>Created At</TableHead>
+                <TableHead>Request Number</TableHead>
+                <TableHead>Workspace</TableHead>
+                <TableHead>Pax</TableHead>
+                <TableHead>Hotel</TableHead>
+                <TableHead>Offer (SAR)</TableHead>
+                <TableHead>Final (SAR)</TableHead>
+                <TableHead>Total Commission (SAR)</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {commissions.map((commission) => (
-                <TableRow key={commission.id}>
+              {commissionData.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>#{item.requestNumber}</TableCell>
+                  <TableCell>{item.workspace}</TableCell>
+                  <TableCell>{item.pax}</TableCell>
+                  <TableCell>{item.hotelName}</TableCell>
+                  <TableCell>{item.offer.toFixed(2)}</TableCell>
+                  <TableCell>{item.final.toFixed(2)}</TableCell>
+                  <TableCell>{item.totalCommission.toFixed(2)}</TableCell>
                   <TableCell>
-                    #{(commission.request as any)?.request_number} - {(commission.request as any)?.travel_name}
-                  </TableCell>
-                  <TableCell>
-                    {(commission.admin as any)?.full_name}
-                  </TableCell>
-                  <TableCell>{commission.commission_double?.toFixed(2) || '0.00'} SAR</TableCell>
-                  <TableCell>{commission.commission_triple?.toFixed(2) || '0.00'} SAR</TableCell>
-                  <TableCell>{commission.commission_quad?.toFixed(2) || '0.00'} SAR</TableCell>
-                  <TableCell>{commission.commission_quint?.toFixed(2) || '0.00'} SAR</TableCell>
-                  <TableCell>
-                    {new Date(commission.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(commission)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(commission.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditMargin(item.requestId, item.margin)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

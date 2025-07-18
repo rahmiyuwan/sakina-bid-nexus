@@ -52,25 +52,27 @@ const getNavigationItems = (role: string) => {
       ];
     
     case 'admin':
+      return [
+        { title: 'Dashboard', url: '/dashboard', icon: Home },
+        { title: 'All Requests', url: '/requests', icon: FileText },
+        { title: 'Commissions', url: '/commissions', icon: DollarSign },
+        { title: 'Hotels', url: '/hotels', icon: Hotel },
+        { title: 'Notifications', url: '/notifications', icon: Bell },
+        { title: 'Profile', url: '/profile', icon: User },
+      ];
+    
     case 'super_admin':
-      const adminItems = [
+      return [
         { title: 'Dashboard', url: '/dashboard', icon: Home },
         { title: 'All Requests', url: '/requests', icon: FileText },
         { title: 'Commissions', url: '/commissions', icon: DollarSign },
         { title: 'Hotels', url: '/hotels', icon: Hotel },
         { title: 'Settings', url: '/settings', icon: Settings },
+        { title: 'Users', url: '/users', icon: Users },
+        { title: 'Workspaces', url: '/workspaces', icon: Building2 },
         { title: 'Notifications', url: '/notifications', icon: Bell },
         { title: 'Profile', url: '/profile', icon: User },
       ];
-      
-      if (role === 'super_admin') {
-        adminItems.splice(-2, 0, 
-          { title: 'Users', url: '/users', icon: Users },
-          { title: 'Workspaces', url: '/workspaces', icon: Building2 }
-        );
-      }
-      
-      return adminItems;
     
     default:
       return [];
