@@ -11,6 +11,11 @@ import AdminPanel from "./pages/AdminPanel";
 import Dashboard from "./pages/Dashboard";
 import Requests from "./pages/Requests";
 import NewRequest from "./pages/NewRequest";
+import Hotels from "./pages/Hotels";
+import Commissions from "./pages/Commissions";
+import Settings from "./pages/Settings";
+import Users from "./pages/Users";
+import Workspaces from "./pages/Workspaces";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 
@@ -31,11 +36,11 @@ const App = () => (
             <Route path="/requests/new" element={<NewRequest />} />
             <Route path="/requests/:id" element={<Requests />} />
             <Route path="/bids" element={<Requests />} />
-            <Route path="/hotels" element={<Requests />} />
-            <Route path="/commissions" element={<Requests />} />
-            <Route path="/settings" element={<Requests />} />
-            <Route path="/users" element={<Requests />} />
-            <Route path="/workspaces" element={<Requests />} />
+            <Route path="/hotels" element={<Hotels />} />
+            <Route path="/commissions" element={<Commissions />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/workspaces" element={<Workspaces />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminPanel />} />
