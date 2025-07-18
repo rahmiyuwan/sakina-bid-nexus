@@ -14,7 +14,280 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      commissions: {
+        Row: {
+          admin_id: string
+          commission_double: number | null
+          commission_quad: number | null
+          commission_quint: number | null
+          commission_triple: number | null
+          created_at: string
+          id: string
+          request_id: string
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          commission_double?: number | null
+          commission_quad?: number | null
+          commission_quint?: number | null
+          commission_triple?: number | null
+          created_at?: string
+          id?: string
+          request_id: string
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          commission_double?: number | null
+          commission_quad?: number | null
+          commission_quint?: number | null
+          commission_triple?: number | null
+          created_at?: string
+          id?: string
+          request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hotels: {
+        Row: {
+          address: string | null
+          city: Database["public"]["Enums"]["city_type"]
+          created_at: string
+          description: string | null
+          distance_to_haram: number | null
+          facilities: Json | null
+          id: string
+          name: string
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city: Database["public"]["Enums"]["city_type"]
+          created_at?: string
+          description?: string | null
+          distance_to_haram?: number | null
+          facilities?: Json | null
+          id?: string
+          name: string
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: Database["public"]["Enums"]["city_type"]
+          created_at?: string
+          description?: string | null
+          distance_to_haram?: number | null
+          facilities?: Json | null
+          id?: string
+          name?: string
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      requests: {
+        Row: {
+          bidding_deadline: string
+          check_in_date: string
+          check_out_date: string
+          city: Database["public"]["Enums"]["city_type"]
+          created_at: string
+          id: string
+          package_type: Database["public"]["Enums"]["package_type"]
+          pax: number
+          request_number: number
+          room_double: number
+          room_quad: number
+          room_quint: number
+          room_triple: number
+          status: Database["public"]["Enums"]["request_status"]
+          tour_leader: string
+          travel_name: string
+          travel_workspace_id: string
+          updated_at: string
+        }
+        Insert: {
+          bidding_deadline: string
+          check_in_date: string
+          check_out_date: string
+          city: Database["public"]["Enums"]["city_type"]
+          created_at?: string
+          id?: string
+          package_type: Database["public"]["Enums"]["package_type"]
+          pax: number
+          request_number?: number
+          room_double?: number
+          room_quad?: number
+          room_quint?: number
+          room_triple?: number
+          status?: Database["public"]["Enums"]["request_status"]
+          tour_leader: string
+          travel_name: string
+          travel_workspace_id: string
+          updated_at?: string
+        }
+        Update: {
+          bidding_deadline?: string
+          check_in_date?: string
+          check_out_date?: string
+          city?: Database["public"]["Enums"]["city_type"]
+          created_at?: string
+          id?: string
+          package_type?: Database["public"]["Enums"]["package_type"]
+          pax?: number
+          request_number?: number
+          room_double?: number
+          room_quad?: number
+          room_quint?: number
+          room_triple?: number
+          status?: Database["public"]["Enums"]["request_status"]
+          tour_leader?: string
+          travel_name?: string
+          travel_workspace_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_travel_workspace_id_fkey"
+            columns: ["travel_workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          key: string
+          updated_at: string
+          value: string
+          value_type: Database["public"]["Enums"]["value_type"]
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          updated_at?: string
+          value: string
+          value_type: Database["public"]["Enums"]["value_type"]
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          updated_at?: string
+          value?: string
+          value_type?: Database["public"]["Enums"]["value_type"]
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          password: string
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          username: string
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_active?: boolean
+          password: string
+          phone?: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          username: string
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          password?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          username?: string
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +296,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      city_type: "Makkah" | "Madinah"
+      package_type: "PROMO" | "VIP" | "REGULAR"
+      request_status: "Submitted" | "Quoted" | "Confirmed"
+      user_role: "travel_agent" | "hotel_provider" | "admin" | "super_admin"
+      value_type: "decimal" | "integer" | "string" | "boolean" | "json"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +427,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      city_type: ["Makkah", "Madinah"],
+      package_type: ["PROMO", "VIP", "REGULAR"],
+      request_status: ["Submitted", "Quoted", "Confirmed"],
+      user_role: ["travel_agent", "hotel_provider", "admin", "super_admin"],
+      value_type: ["decimal", "integer", "string", "boolean", "json"],
+    },
   },
 } as const
