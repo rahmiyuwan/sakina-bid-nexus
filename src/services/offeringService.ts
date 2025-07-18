@@ -113,9 +113,10 @@ export const offeringService = {
         provider:profiles!provider_user_id(*),
         hotel:hotels!hotel_id(*)
       `)
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error(`Offering with id ${id} not found or cannot be updated`);
     return data as HotelOffering;
   },
 
