@@ -119,12 +119,6 @@ const CommissionManagement: React.FC = () => {
           setDialogOpen(open);
           if (!open) resetForm();
         }}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Commission
-            </Button>
-          </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
@@ -165,45 +159,69 @@ const CommissionManagement: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="commission_double">Double Room Commission</Label>
-                  <Input
-                    id="commission_double"
-                    type="number"
-                    step="0.01"
-                    value={formData.commission_double}
-                    onChange={(e) => setFormData({ ...formData, commission_double: parseFloat(e.target.value) || 0 })}
-                  />
+                  <div className="flex">
+                    <Input
+                      id="commission_double"
+                      type="number"
+                      step="0.01"
+                      value={formData.commission_double}
+                      onChange={(e) => setFormData({ ...formData, commission_double: parseFloat(e.target.value) || 0 })}
+                      className="rounded-r-none"
+                    />
+                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
+                      SAR
+                    </span>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="commission_triple">Triple Room Commission</Label>
-                  <Input
-                    id="commission_triple"
-                    type="number"
-                    step="0.01"
-                    value={formData.commission_triple}
-                    onChange={(e) => setFormData({ ...formData, commission_triple: parseFloat(e.target.value) || 0 })}
-                  />
+                  <div className="flex">
+                    <Input
+                      id="commission_triple"
+                      type="number"
+                      step="0.01"
+                      value={formData.commission_triple}
+                      onChange={(e) => setFormData({ ...formData, commission_triple: parseFloat(e.target.value) || 0 })}
+                      className="rounded-r-none"
+                    />
+                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
+                      SAR
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="commission_quad">Quad Room Commission</Label>
-                  <Input
-                    id="commission_quad"
-                    type="number"
-                    step="0.01"
-                    value={formData.commission_quad}
-                    onChange={(e) => setFormData({ ...formData, commission_quad: parseFloat(e.target.value) || 0 })}
-                  />
+                  <div className="flex">
+                    <Input
+                      id="commission_quad"
+                      type="number"
+                      step="0.01"
+                      value={formData.commission_quad}
+                      onChange={(e) => setFormData({ ...formData, commission_quad: parseFloat(e.target.value) || 0 })}
+                      className="rounded-r-none"
+                    />
+                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
+                      SAR
+                    </span>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="commission_quint">Quint Room Commission</Label>
-                  <Input
-                    id="commission_quint"
-                    type="number"
-                    step="0.01"
-                    value={formData.commission_quint}
-                    onChange={(e) => setFormData({ ...formData, commission_quint: parseFloat(e.target.value) || 0 })}
-                  />
+                  <div className="flex">
+                    <Input
+                      id="commission_quint"
+                      type="number"
+                      step="0.01"
+                      value={formData.commission_quint}
+                      onChange={(e) => setFormData({ ...formData, commission_quint: parseFloat(e.target.value) || 0 })}
+                      className="rounded-r-none"
+                    />
+                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-muted text-muted-foreground text-sm">
+                      SAR
+                    </span>
+                  </div>
                 </div>
               </div>
               <Button type="submit" className="w-full">
@@ -241,10 +259,10 @@ const CommissionManagement: React.FC = () => {
                   <TableCell>
                     {(commission.admin as any)?.full_name}
                   </TableCell>
-                  <TableCell>${commission.commission_double?.toFixed(2) || '0.00'}</TableCell>
-                  <TableCell>${commission.commission_triple?.toFixed(2) || '0.00'}</TableCell>
-                  <TableCell>${commission.commission_quad?.toFixed(2) || '0.00'}</TableCell>
-                  <TableCell>${commission.commission_quint?.toFixed(2) || '0.00'}</TableCell>
+                  <TableCell>{commission.commission_double?.toFixed(2) || '0.00'} SAR</TableCell>
+                  <TableCell>{commission.commission_triple?.toFixed(2) || '0.00'} SAR</TableCell>
+                  <TableCell>{commission.commission_quad?.toFixed(2) || '0.00'} SAR</TableCell>
+                  <TableCell>{commission.commission_quint?.toFixed(2) || '0.00'} SAR</TableCell>
                   <TableCell>
                     {new Date(commission.created_at).toLocaleDateString()}
                   </TableCell>

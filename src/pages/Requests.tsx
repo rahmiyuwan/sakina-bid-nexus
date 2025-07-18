@@ -5,14 +5,15 @@ import { useApp } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus } from 'lucide-react';
+import { Plus, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Requests: React.FC = () => {
-  const { requests, currentProfile, dataLoading, refreshRequests } = useApp();
+  const { requests, offerings, currentProfile, dataLoading, refreshRequests, refreshOfferings } = useApp();
 
   useEffect(() => {
     refreshRequests();
+    refreshOfferings();
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -79,55 +80,85 @@ const Requests: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              requests.map((request) => (
-                <Card key={request.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Request #{request.id.slice(-6)}</CardTitle>
-                      <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="font-medium">Travel Name</p>
-                        <p className="text-muted-foreground">{request.travelName}</p>
+              requests.map((request) => {
+                const requestOfferings = offerings.filter(offering => offering.request_id === request.id);
+                const isAdmin = currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin';
+                
+                return (
+                  <Card key={request.id}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">Request #{request.id.slice(-6)}</CardTitle>
+                        <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
                       </div>
-                      <div>
-                        <p className="font-medium">Tour Leader</p>
-                        <p className="text-muted-foreground">{request.tlName}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                        <div>
+                          <p className="font-medium">Travel Name</p>
+                          <p className="text-muted-foreground">{request.travelName}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Tour Leader</p>
+                          <p className="text-muted-foreground">{request.tlName}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">City</p>
+                          <p className="text-muted-foreground">{request.city}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">PAX</p>
+                          <p className="text-muted-foreground">{request.paxCount}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Check-in</p>
+                          <p className="text-muted-foreground">{new Date(request.checkIn).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Check-out</p>
+                          <p className="text-muted-foreground">{new Date(request.checkOut).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Package</p>
+                          <p className="text-muted-foreground">{request.packageType}</p>
+                        </div>
+                        <div className="flex items-center">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/requests/${request.id}`}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Details
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">City</p>
-                        <p className="text-muted-foreground">{request.city}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">PAX</p>
-                        <p className="text-muted-foreground">{request.paxCount}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Check-in</p>
-                        <p className="text-muted-foreground">{new Date(request.checkIn).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Check-out</p>
-                        <p className="text-muted-foreground">{new Date(request.checkOut).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Package</p>
-                        <p className="text-muted-foreground">{request.packageType}</p>
-                      </div>
-                      <div className="flex items-center">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link to={`/requests/${request.id}`}>
-                            View Details
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+                      
+                      {isAdmin && requestOfferings.length > 0 && (
+                        <div className="mt-4 pt-4 border-t">
+                          <h4 className="font-medium mb-3">Offers ({requestOfferings.length})</h4>
+                          <div className="space-y-2">
+                            {requestOfferings.map((offering) => (
+                              <div key={offering.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                                <div className="flex-1">
+                                  <p className="font-medium text-sm">{offering.hotel_name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Double: {offering.final_price_double} SAR | 
+                                    Triple: {offering.final_price_triple} SAR | 
+                                    Quad: {offering.final_price_quad} SAR | 
+                                    Quint: {offering.final_price_quint} SAR
+                                  </p>
+                                </div>
+                                <Badge variant={offering.status === 'CONFIRMED' ? 'default' : 'secondary'}>
+                                  {offering.status}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
             )}
           </div>
         </div>
