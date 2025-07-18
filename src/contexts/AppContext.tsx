@@ -18,7 +18,7 @@ interface AppContextType {
   offerings: HotelOffering[];
   
   // Actions
-  addRequest: (request: Omit<HotelRequest, 'id' | 'createdAt'>) => void;
+  addRequest: (request: Omit<HotelRequest, 'id' | 'createdAt'>) => Promise<HotelRequest>;
   addOffering: (offering: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'>) => void;
   confirmOffering: (offeringId: string, requestId: string) => void;
   updateOfferingMargin: (offeringId: string, margin: number) => void;
@@ -112,13 +112,51 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
-  const addRequest = (requestData: Omit<HotelRequest, 'id' | 'createdAt'>) => {
-    const newRequest: HotelRequest = {
-      ...requestData,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-    };
-    setRequests(prev => [...prev, newRequest]);
+  const addRequest = async (requestData: Omit<HotelRequest, 'id' | 'createdAt'>) => {
+    try {
+      // Save to database using requestService
+      const { requestService } = await import('@/services/requestService');
+      const dbRequest = await requestService.create({
+        travel_name: requestData.travelName,
+        tour_leader: requestData.tlName,
+        pax: requestData.paxCount,
+        city: requestData.city as 'Makkah' | 'Madinah',
+        package_type: requestData.packageType as 'PROMO' | 'VIP' | 'REGULAR',
+        check_in_date: requestData.checkIn,
+        check_out_date: requestData.checkOut,
+        room_double: requestData.roomDb,
+        room_triple: requestData.roomTp,
+        room_quad: requestData.roomQd,
+        room_quint: requestData.roomQt,
+        travel_workspace_id: currentProfile?.workspace_id || '',
+        status: 'Submitted' as const,
+        bidding_deadline: new Date(new Date(requestData.checkIn).getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // Convert database format to app format and add to local state
+      const newRequest: HotelRequest = {
+        id: dbRequest.id,
+        travelName: dbRequest.travel_name,
+        tlName: dbRequest.tour_leader,
+        paxCount: dbRequest.pax,
+        city: dbRequest.city,
+        packageType: dbRequest.package_type,
+        checkIn: dbRequest.check_in_date,
+        checkOut: dbRequest.check_out_date,
+        roomDb: dbRequest.room_double,
+        roomTp: dbRequest.room_triple,
+        roomQd: dbRequest.room_quad,
+        roomQt: dbRequest.room_quint,
+        status: dbRequest.status as RequestStatus,
+        travelUserId: dbRequest.travel_workspace_id,
+        createdAt: dbRequest.created_at,
+      };
+      setRequests(prev => [...prev, newRequest]);
+      return newRequest;
+    } catch (error) {
+      console.error('Error creating request:', error);
+      throw error;
+    }
   };
 
   const addOffering = (offeringData: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'>) => {

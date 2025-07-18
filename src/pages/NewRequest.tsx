@@ -7,13 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
-import { requestService } from '@/services/requestService';
 import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
 
 const NewRequest: React.FC = () => {
   const navigate = useNavigate();
-  const { currentProfile } = useApp();
+  const { currentProfile, addRequest } = useApp();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     travel_name: '',
@@ -39,23 +38,22 @@ const NewRequest: React.FC = () => {
     setLoading(true);
     try {
       const requestData = {
-        travel_name: formData.travel_name,
-        tour_leader: formData.tour_leader,
-        pax: parseInt(formData.pax) || 0,
-        city: formData.city as 'Makkah' | 'Madinah',
-        package_type: formData.package_type as 'PROMO' | 'VIP' | 'REGULAR',
-        check_in_date: formData.check_in_date,
-        check_out_date: formData.check_out_date,
-        room_double: parseInt(formData.room_double) || 0,
-        room_triple: parseInt(formData.room_triple) || 0,
-        room_quad: parseInt(formData.room_quad) || 0,
-        room_quint: parseInt(formData.room_quint) || 0,
-        travel_workspace_id: currentProfile.workspace_id,
-        status: 'Submitted' as const,
-        bidding_deadline: new Date(new Date(formData.check_in_date).getTime() - 24 * 60 * 60 * 1000).toISOString(),
+        travelName: formData.travel_name,
+        tlName: formData.tour_leader,
+        paxCount: parseInt(formData.pax) || 0,
+        city: formData.city,
+        packageType: formData.package_type,
+        checkIn: formData.check_in_date,
+        checkOut: formData.check_out_date,
+        roomDb: parseInt(formData.room_double) || 0,
+        roomTp: parseInt(formData.room_triple) || 0,
+        roomQd: parseInt(formData.room_quad) || 0,
+        roomQt: parseInt(formData.room_quint) || 0,
+        status: 'PENDING' as const,
+        travelUserId: currentProfile.workspace_id,
       };
 
-      await requestService.create(requestData);
+      await addRequest(requestData);
       toast.success('Request created successfully!');
       navigate('/requests');
     } catch (error) {
