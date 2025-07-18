@@ -67,13 +67,19 @@ const Register: React.FC = () => {
       return;
     }
 
-    // Create user
+    // Create user with database User type structure
     const newUser = {
       id: Math.random().toString(36).substr(2, 9),
+      username: formData.username,
+      password: formData.password,
       email: `${formData.username}@${formData.role.toLowerCase()}.com`,
-      name: formData.username,
-      role: formData.role,
-      createdAt: new Date().toISOString(),
+      full_name: formData.username,
+      role: formData.role as any, // Will be converted to proper database role type
+      workspace_id: null,
+      phone: null,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     
     setCurrentUser(newUser);
@@ -81,8 +87,8 @@ const Register: React.FC = () => {
   };
 
   const roleOptions = [
-    { value: 'TRAVEL', label: 'Travel Agency', icon: User },
-    { value: 'PROVIDER', label: 'Hotel Provider', icon: Building2 }
+    { value: 'travel_agent', label: 'Travel Agency', icon: User },
+    { value: 'hotel_provider', label: 'Hotel Provider', icon: Building2 }
   ];
 
   const selectedRoleOption = roleOptions.find(option => option.value === formData.role);

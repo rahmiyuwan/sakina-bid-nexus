@@ -14,11 +14,12 @@ const DashboardLayout: React.FC = () => {
 
   const renderDashboard = () => {
     switch (currentUser.role) {
-      case 'TRAVEL':
+      case 'travel_agent':
         return <TravelDashboard />;
-      case 'PROVIDER':
+      case 'hotel_provider':
         return <ProviderDashboard />;
-      case 'ADMIN':
+      case 'admin':
+      case 'super_admin':
         return <AdminDashboard />;
       default:
         return <div>Unknown role</div>;

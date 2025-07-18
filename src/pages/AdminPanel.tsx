@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
-import { userService } from '@/services/userService';
+import { useApp } from '@/contexts/AppContext';
 import WorkspaceManagement from '@/components/admin/WorkspaceManagement';
 import UserManagement from '@/components/admin/UserManagement';
 import SettingManagement from '@/components/admin/SettingManagement';
@@ -13,34 +12,7 @@ import CommissionManagement from '@/components/admin/CommissionManagement';
 
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState('workspaces');
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkUserRole = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const userData = await userService.getById(user.id);
-          setCurrentUser(userData);
-        }
-      } catch (error) {
-        console.error('Error checking user role:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkUserRole();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="container mx-auto p-6 flex items-center justify-center">
-        <div>Loading...</div>
-      </div>
-    );
-  }
+  const { currentUser } = useApp();
 
   if (!currentUser || currentUser.role !== 'super_admin') {
     return <Navigate to="/" replace />;

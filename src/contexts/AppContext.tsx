@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User, HotelRequest, HotelOffering, UserRole, OfferingStatus, RequestStatus } from '@/types';
+import { User } from '@/types/database';
+import { HotelRequest, HotelOffering, UserRole, OfferingStatus, RequestStatus } from '@/types';
 
 interface AppContextType {
   // User management

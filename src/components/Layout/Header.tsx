@@ -12,9 +12,10 @@ const Header: React.FC = () => {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'TRAVEL': return 'Travel Agency';
-      case 'PROVIDER': return 'Hotel Provider';
-      case 'ADMIN': return 'Administrator';
+      case 'travel_agent': return 'Travel Agency';
+      case 'hotel_provider': return 'Hotel Provider';
+      case 'admin': return 'Administrator';
+      case 'super_admin': return 'Super Administrator';
       default: return role;
     }
   };
@@ -48,7 +49,7 @@ const Header: React.FC = () => {
               
               <div className="text-right">
                 <p className="text-sm font-medium text-foreground">
-                  {currentUser.name}
+                  {currentUser.full_name}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {getRoleDisplayName(currentUser.role)}

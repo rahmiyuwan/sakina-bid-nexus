@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
+import { userService } from '@/services/userService';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -17,12 +18,13 @@ const Login: React.FC = () => {
     username: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Validation
     if (!formData.username.trim()) {
       toast({
@@ -42,21 +44,47 @@ const Login: React.FC = () => {
       return;
     }
 
-    // Mock login - in real app this would be handled by authentication service
-    const mockUser = {
-      id: Math.random().toString(36).substr(2, 9),
-      email: `${formData.username}@example.com`,
-      name: formData.username,
-      role: 'TRAVEL' as const, // Default role, in real app would come from backend
-      createdAt: new Date().toISOString(),
-    };
-    
-    setCurrentUser(mockUser);
-    toast({
-      title: "Success",
-      description: "Login successful!",
-    });
-    navigate('/');
+    setLoading(true);
+    try {
+      // Get all users and find matching username/password
+      const users = await userService.getAll();
+      const user = users.find(u => 
+        u.username === formData.username && 
+        u.password === formData.password &&
+        u.is_active
+      );
+
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Invalid username or password",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setCurrentUser(user);
+      toast({
+        title: "Success",
+        description: "Login successful!",
+      });
+
+      // Navigate based on user role
+      if (user.role === 'super_admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Error",
+        description: "Login failed. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -113,8 +141,9 @@ const Login: React.FC = () => {
               onClick={handleLogin}
               className="w-full"
               size="lg"
+              disabled={loading}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </Button>
 
             <Button 
