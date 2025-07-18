@@ -78,7 +78,7 @@ const ProviderDashboard: React.FC = () => {
   };
 
   const totalRevenue = confirmedOfferings.reduce((total, offer) => {
-    return total + offer.final_price_double + offer.final_price_triple + offer.final_price_quad + offer.final_price_quint;
+    return total + offer.price_double + offer.price_triple + offer.price_quad + offer.price_quint;
   }, 0);
 
   const cancelBid = async (offeringId: string) => {

@@ -143,25 +143,41 @@ const RequestDetail: React.FC = () => {
                         {request.roomDb > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Double ({request.roomDb} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.final_price_double} SAR/night</span>
+                            <span className="font-medium text-foreground">
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                ? `${offering.final_price_double} SAR/night` 
+                                : `${offering.price_double} SAR/night`}
+                            </span>
                           </div>
                         )}
                         {request.roomTp > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Triple ({request.roomTp} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.final_price_triple} SAR/night</span>
+                            <span className="font-medium text-foreground">
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                ? `${offering.final_price_triple} SAR/night` 
+                                : `${offering.price_triple} SAR/night`}
+                            </span>
                           </div>
                         )}
                         {request.roomQd > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Quad ({request.roomQd} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.final_price_quad} SAR/night</span>
+                            <span className="font-medium text-foreground">
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                ? `${offering.final_price_quad} SAR/night` 
+                                : `${offering.price_quad} SAR/night`}
+                            </span>
                           </div>
                         )}
                         {request.roomQt > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Quint ({request.roomQt} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.final_price_quint} SAR/night</span>
+                            <span className="font-medium text-foreground">
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                ? `${offering.final_price_quint} SAR/night` 
+                                : `${offering.price_quint} SAR/night`}
+                            </span>
                           </div>
                         )}
                       </div>
