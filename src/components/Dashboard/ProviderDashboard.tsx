@@ -250,11 +250,6 @@ const ProviderDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Note:</strong> A 10 SAR admin margin will be automatically added to your prices for the final customer pricing.
-                </p>
-              </div>
 
               <div className="flex justify-end space-x-2">
                 <Button 
@@ -311,22 +306,18 @@ const ProviderDashboard: React.FC = () => {
                       <div>
                         <p className="font-medium">Double</p>
                         <p className="text-muted-foreground">{offering.priceDb} SAR</p>
-                        <p className="text-xs text-secondary">Final: {offering.finalPriceDb} SAR</p>
                       </div>
                       <div>
                         <p className="font-medium">Triple</p>
                         <p className="text-muted-foreground">{offering.priceTp} SAR</p>
-                        <p className="text-xs text-secondary">Final: {offering.finalPriceTp} SAR</p>
                       </div>
                       <div>
                         <p className="font-medium">Quad</p>
                         <p className="text-muted-foreground">{offering.priceQd} SAR</p>
-                        <p className="text-xs text-secondary">Final: {offering.finalPriceQd} SAR</p>
                       </div>
                       <div>
                         <p className="font-medium">Quint</p>
                         <p className="text-muted-foreground">{offering.priceQt} SAR</p>
-                        <p className="text-xs text-secondary">Final: {offering.finalPriceQt} SAR</p>
                       </div>
                     </div>
                   </CardContent>

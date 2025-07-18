@@ -152,7 +152,7 @@ const AdminDashboard: React.FC = () => {
                     <div>
                       <p className="font-medium text-sm">{offering.hotelName}</p>
                       <p className="text-xs text-muted-foreground">
-                        {request?.travelName} • Margin: {offering.adminMargin} SAR
+                        {request?.travelName}
                       </p>
                     </div>
                     <Badge className={getStatusColor(offering.status)}>
