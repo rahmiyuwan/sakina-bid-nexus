@@ -195,7 +195,7 @@ const RequestManagement: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="travel_workspace_id">Travel Workspace</Label>
-                  <Select value={formData.travel_workspace_id} onValueChange={(value) => setFormData({ ...formData, travel_workspace_id: value })}>
+                  <Select value={formData.travel_workspace_id || undefined} onValueChange={(value) => setFormData({ ...formData, travel_workspace_id: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select workspace" />
                     </SelectTrigger>
