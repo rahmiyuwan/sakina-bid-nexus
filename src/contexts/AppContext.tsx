@@ -36,7 +36,7 @@ interface AppContextType {
   
   // Actions
   addRequest: (request: Omit<HotelRequest, 'id' | 'createdAt'>) => Promise<HotelRequest>;
-  addOffering: (offering: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'>) => void;
+  addOffering: (offering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'>) => void;
   confirmOffering: (offeringId: string, requestId: string) => void;
   updateOfferingMargin: (offeringId: string, margin: number) => void;
 }

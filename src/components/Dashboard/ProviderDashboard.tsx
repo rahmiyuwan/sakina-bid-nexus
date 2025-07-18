@@ -19,7 +19,7 @@ const ProviderDashboard: React.FC = () => {
     priceQt: '',
   });
 
-  const userOfferings = offerings.filter(offer => offer.providerUserId === currentUser?.id);
+  const userOfferings = offerings.filter(offer => offer.provider_user_id === currentUser?.id);
   const pendingRequests = requests.filter(req => req.status === 'Submitted' || req.status === 'Quoted');
   const pendingOfferings = userOfferings.filter(offer => offer.status === 'PENDING');
   const confirmedOfferings = userOfferings.filter(offer => offer.status === 'CONFIRMED');
@@ -28,15 +28,16 @@ const ProviderDashboard: React.FC = () => {
     e.preventDefault();
     if (!currentUser || !selectedRequest) return;
 
-    const newOffering: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'> = {
-      requestId: selectedRequest,
-      hotelName: offerData.hotelName,
-      providerUserId: currentUser.id,
-      priceDb: parseFloat(offerData.priceDb) || 0,
-      priceTp: parseFloat(offerData.priceTp) || 0,
-      priceQd: parseFloat(offerData.priceQd) || 0,
-      priceQt: parseFloat(offerData.priceQt) || 0,
-      adminMargin: 10, // Default margin
+    const newOffering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'> = {
+      request_id: selectedRequest,
+      hotel_name: offerData.hotelName,
+      provider_user_id: currentUser.id,
+      hotel_id: '', // This should be set from hotel selection
+      price_double: parseFloat(offerData.priceDb) || 0,
+      price_triple: parseFloat(offerData.priceTp) || 0,
+      price_quad: parseFloat(offerData.priceQd) || 0,
+      price_quint: parseFloat(offerData.priceQt) || 0,
+      admin_margin: 10, // Default margin
       status: 'PENDING',
     };
 
@@ -61,11 +62,11 @@ const ProviderDashboard: React.FC = () => {
   };
 
   const hasExistingOffer = (requestId: string) => {
-    return userOfferings.some(offer => offer.requestId === requestId);
+    return userOfferings.some(offer => offer.request_id === requestId);
   };
 
   const totalRevenue = confirmedOfferings.reduce((total, offer) => {
-    return total + offer.finalPriceDb + offer.finalPriceTp + offer.finalPriceQd + offer.finalPriceQt;
+    return total + offer.final_price_double + offer.final_price_triple + offer.final_price_quad + offer.final_price_quint;
   }, 0);
 
   return (

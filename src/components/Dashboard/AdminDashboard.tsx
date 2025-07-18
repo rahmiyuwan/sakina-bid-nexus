@@ -18,12 +18,12 @@ const AdminDashboard: React.FC = () => {
   const confirmedOfferings = offerings.filter(offer => offer.status === 'CONFIRMED');
   
   const totalRevenue = confirmedOfferings.reduce((total, offer) => {
-    const adminRevenue = offer.adminMargin * 4; // Assuming 4 room types for simplicity
+    const adminRevenue = offer.admin_margin * 4; // Assuming 4 room types for simplicity
     return total + adminRevenue;
   }, 0);
 
   const totalTransactionValue = confirmedOfferings.reduce((total, offer) => {
-    return total + offer.finalPriceDb + offer.finalPriceTp + offer.finalPriceQd + offer.finalPriceQt;
+    return total + offer.final_price_double + offer.final_price_triple + offer.final_price_quad + offer.final_price_quint;
   }, 0);
 
   const getStatusColor = (status: string) => {
@@ -148,11 +148,11 @@ const AdminDashboard: React.FC = () => {
           <CardContent>
             <div className="space-y-3">
               {offerings.slice(-5).reverse().map((offering) => {
-                const request = getRequestForOffering(offering.requestId);
+                const request = getRequestForOffering(offering.request_id);
                 return (
                   <div key={offering.id} className="flex justify-between items-center p-3 bg-gradient-card rounded-lg">
                     <div>
-                      <p className="font-medium text-sm">{offering.hotelName}</p>
+                      <p className="font-medium text-sm">{offering.hotel_name}</p>
                       <p className="text-xs text-muted-foreground">
                         {request?.travelName}
                       </p>
@@ -188,12 +188,12 @@ const AdminDashboard: React.FC = () => {
               <p className="text-muted-foreground text-center py-8">No offerings to manage yet</p>
             ) : (
               offerings.map((offering) => {
-                const request = getRequestForOffering(offering.requestId);
+                const request = getRequestForOffering(offering.request_id);
                 return (
                   <div key={offering.id} className="border rounded-lg p-4 space-y-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-medium">{offering.hotelName}</h4>
+                        <h4 className="font-medium">{offering.hotel_name}</h4>
                         <p className="text-sm text-muted-foreground">
                           Request: {request?.travelName} • {request?.city}
                         </p>
@@ -202,30 +202,30 @@ const AdminDashboard: React.FC = () => {
                         </Badge>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">Current Margin: {offering.adminMargin} SAR</p>
+                        <p className="text-sm font-medium">Current Margin: {offering.admin_margin} SAR</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                       <div className="space-y-1">
                         <p className="font-medium">Double Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.priceDb} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.finalPriceDb} SAR</p>
+                        <p className="text-muted-foreground">Provider: {offering.price_double} SAR</p>
+                        <p className="text-secondary font-medium">Final: {offering.final_price_double} SAR</p>
                       </div>
                       <div className="space-y-1">
                         <p className="font-medium">Triple Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.priceTp} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.finalPriceTp} SAR</p>
+                        <p className="text-muted-foreground">Provider: {offering.price_triple} SAR</p>
+                        <p className="text-secondary font-medium">Final: {offering.final_price_triple} SAR</p>
                       </div>
                       <div className="space-y-1">
                         <p className="font-medium">Quad Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.priceQd} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.finalPriceQd} SAR</p>
+                        <p className="text-muted-foreground">Provider: {offering.price_quad} SAR</p>
+                        <p className="text-secondary font-medium">Final: {offering.final_price_quad} SAR</p>
                       </div>
                       <div className="space-y-1">
                         <p className="font-medium">Quint Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.priceQt} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.finalPriceQt} SAR</p>
+                        <p className="text-muted-foreground">Provider: {offering.price_quint} SAR</p>
+                        <p className="text-secondary font-medium">Final: {offering.final_price_quint} SAR</p>
                       </div>
                     </div>
 
@@ -238,7 +238,7 @@ const AdminDashboard: React.FC = () => {
                         type="number"
                         step="0.01"
                         min="0"
-                        placeholder={offering.adminMargin.toString()}
+                        placeholder={offering.admin_margin.toString()}
                         value={marginEdits[offering.id] || ''}
                         onChange={(e) => setMarginEdits(prev => ({ 
                           ...prev, 

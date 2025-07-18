@@ -82,7 +82,7 @@ const TravelDashboard: React.FC = () => {
   };
 
   const getRequestOfferings = (requestId: string) => {
-    return offerings.filter(offer => offer.requestId === requestId);
+    return offerings.filter(offer => offer.request_id === requestId);
   };
 
   const getStatusColor = (status: string) => {
