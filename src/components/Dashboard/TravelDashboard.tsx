@@ -10,7 +10,7 @@ import { HotelRequest } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 const TravelDashboard: React.FC = () => {
-  const { currentUser, requests, offerings, addRequest, confirmOffering } = useApp();
+  const { currentUser, currentProfile, requests, offerings, addRequest, confirmOffering } = useApp();
   const { toast } = useToast();
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,7 +27,7 @@ const TravelDashboard: React.FC = () => {
     roomQt: '',
   });
 
-  const userRequests = requests.filter(req => req.travelUserId === currentUser?.id);
+  const userRequests = requests.filter(req => req.travelUserId === currentProfile?.workspace_id);
   const pendingRequests = userRequests.filter(req => req.status === 'Submitted');
   const confirmedRequests = userRequests.filter(req => req.status === 'Confirmed');
 
@@ -48,7 +48,7 @@ const TravelDashboard: React.FC = () => {
       roomQd: parseInt(formData.roomQd) || 0,
       roomQt: parseInt(formData.roomQt) || 0,
       status: 'Submitted',
-      travelUserId: currentUser.id,
+      travelUserId: currentProfile?.workspace_id || '',
     };
 
     addRequest(newRequest);
