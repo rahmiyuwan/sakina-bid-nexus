@@ -97,6 +97,88 @@ export type Database = {
         }
         Relationships: []
       }
+      offerings: {
+        Row: {
+          admin_margin: number | null
+          created_at: string
+          final_price_double: number | null
+          final_price_quad: number | null
+          final_price_quint: number | null
+          final_price_triple: number | null
+          hotel_id: string
+          hotel_name: string
+          id: string
+          price_double: number | null
+          price_quad: number | null
+          price_quint: number | null
+          price_triple: number | null
+          provider_user_id: string
+          request_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_margin?: number | null
+          created_at?: string
+          final_price_double?: number | null
+          final_price_quad?: number | null
+          final_price_quint?: number | null
+          final_price_triple?: number | null
+          hotel_id: string
+          hotel_name: string
+          id?: string
+          price_double?: number | null
+          price_quad?: number | null
+          price_quint?: number | null
+          price_triple?: number | null
+          provider_user_id: string
+          request_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_margin?: number | null
+          created_at?: string
+          final_price_double?: number | null
+          final_price_quad?: number | null
+          final_price_quint?: number | null
+          final_price_triple?: number | null
+          hotel_id?: string
+          hotel_name?: string
+          id?: string
+          price_double?: number | null
+          price_quad?: number | null
+          price_quint?: number | null
+          price_triple?: number | null
+          provider_user_id?: string
+          request_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offerings_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offerings_provider_user_id_fkey"
+            columns: ["provider_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offerings_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

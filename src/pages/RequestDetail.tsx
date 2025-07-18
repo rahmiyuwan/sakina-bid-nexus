@@ -55,26 +55,34 @@ const RequestDetail: React.FC = () => {
 
   const hasExistingOffer = () => {
     return offerings.some(offer => 
-      offer.requestId === requestId && 
-      offer.providerUserId === currentUser?.id
+      offer.request_id === requestId && 
+      offer.provider_user_id === currentUser?.id
     );
   };
 
-  const requestOfferings = offerings.filter(offer => offer.requestId === requestId);
+  const requestOfferings = offerings.filter(offer => offer.request_id === requestId);
 
   const handleSubmitOffer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !requestId) return;
 
-    const newOffering: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'> = {
-      requestId: requestId,
-      hotelName: offerData.hotelName,
-      providerUserId: currentUser.id,
-      priceDb: parseFloat(offerData.priceDb) || 0,
-      priceTp: parseFloat(offerData.priceTp) || 0,
-      priceQd: parseFloat(offerData.priceQd) || 0,
-      priceQt: parseFloat(offerData.priceQt) || 0,
-      adminMargin: 10, // Default margin
+    // Find selected hotel to get hotel_id
+    const selectedHotel = hotels.find(hotel => hotel.name === offerData.hotelName);
+    if (!selectedHotel) {
+      console.error('Selected hotel not found');
+      return;
+    }
+
+    const newOffering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'> = {
+      request_id: requestId,
+      provider_user_id: currentUser.id,
+      hotel_id: selectedHotel.id,
+      hotel_name: offerData.hotelName,
+      price_double: parseFloat(offerData.priceDb) || 0,
+      price_triple: parseFloat(offerData.priceTp) || 0,
+      price_quad: parseFloat(offerData.priceQd) || 0,
+      price_quint: parseFloat(offerData.priceQt) || 0,
+      admin_margin: 10, // Default margin
       status: 'PENDING',
     };
 
@@ -121,7 +129,7 @@ const RequestDetail: React.FC = () => {
                   {requestOfferings.map((offering) => (
                     <div key={offering.id} className="p-4 border border-border rounded-lg bg-background">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-semibold text-foreground">{offering.hotelName}</h4>
+                        <h4 className="font-semibold text-foreground">{offering.hotel_name}</h4>
                         <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                           {offering.status}
                         </Badge>
@@ -131,25 +139,25 @@ const RequestDetail: React.FC = () => {
                         {request.roomDb > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Double ({request.roomDb} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.finalPriceDb} SAR/night</span>
+                            <span className="font-medium text-foreground">{offering.final_price_double} SAR/night</span>
                           </div>
                         )}
                         {request.roomTp > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Triple ({request.roomTp} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.finalPriceTp} SAR/night</span>
+                            <span className="font-medium text-foreground">{offering.final_price_triple} SAR/night</span>
                           </div>
                         )}
                         {request.roomQd > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Quad ({request.roomQd} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.finalPriceQd} SAR/night</span>
+                            <span className="font-medium text-foreground">{offering.final_price_quad} SAR/night</span>
                           </div>
                         )}
                         {request.roomQt > 0 && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Quint ({request.roomQt} rooms):</span>
-                            <span className="font-medium text-foreground">{offering.finalPriceQt} SAR/night</span>
+                            <span className="font-medium text-foreground">{offering.final_price_quint} SAR/night</span>
                           </div>
                         )}
                       </div>
@@ -157,7 +165,7 @@ const RequestDetail: React.FC = () => {
                       <div className="mt-3 pt-3 border-t border-border">
                         <div className="flex justify-between items-center">
                           <span className="text-xs text-muted-foreground">
-                            Submitted on {new Date(offering.createdAt).toLocaleDateString()}
+                            Submitted on {new Date(offering.created_at).toLocaleDateString()}
                           </span>
                           {offering.status === 'PENDING' && (
                             <Button 

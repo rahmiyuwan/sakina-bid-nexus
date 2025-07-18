@@ -44,20 +44,22 @@ export interface HotelRequest {
 
 export interface HotelOffering {
   id: string;
-  requestId: string;
-  hotelName: string;
-  providerUserId: string;
-  priceDb: number;
-  priceTp: number;
-  priceQd: number;
-  priceQt: number;
-  adminMargin: number;
-  finalPriceDb: number;
-  finalPriceTp: number;
-  finalPriceQd: number;
-  finalPriceQt: number;
+  request_id: string;
+  provider_user_id: string;
+  hotel_id: string;
+  hotel_name: string;
+  price_double: number;
+  price_triple: number;
+  price_quad: number;
+  price_quint: number;
+  admin_margin: number;
+  final_price_double: number;
+  final_price_triple: number;
+  final_price_quad: number;
+  final_price_quint: number;
   status: OfferingStatus;
-  createdAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DashboardStats {

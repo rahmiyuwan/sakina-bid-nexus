@@ -293,15 +293,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [currentProfile, loading]);
 
-  const addOffering = (offeringData: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'>) => {
+  const addOffering = (offeringData: Omit<HotelOffering, 'id' | 'created_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint' | 'updated_at'>) => {
     const newOffering: HotelOffering = {
       ...offeringData,
       id: generateId(),
-      finalPriceDb: offeringData.priceDb + offeringData.adminMargin,
-      finalPriceTp: offeringData.priceTp + offeringData.adminMargin,
-      finalPriceQd: offeringData.priceQd + offeringData.adminMargin,
-      finalPriceQt: offeringData.priceQt + offeringData.adminMargin,
-      createdAt: new Date().toISOString(),
+      final_price_double: offeringData.price_double * (1 + offeringData.admin_margin / 100),
+      final_price_triple: offeringData.price_triple * (1 + offeringData.admin_margin / 100),
+      final_price_quad: offeringData.price_quad * (1 + offeringData.admin_margin / 100),
+      final_price_quint: offeringData.price_quint * (1 + offeringData.admin_margin / 100),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     setOfferings(prev => [...prev, newOffering]);
   };
@@ -311,7 +312,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setOfferings(prev => prev.map(offering => 
       offering.id === offeringId 
         ? { ...offering, status: 'CONFIRMED' as OfferingStatus }
-        : offering.requestId === requestId 
+        : offering.request_id === requestId 
           ? { ...offering, status: 'CANCELED' as OfferingStatus }
           : offering
     ));
@@ -329,11 +330,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       offering.id === offeringId 
         ? { 
             ...offering, 
-            adminMargin: margin,
-            finalPriceDb: offering.priceDb + margin,
-            finalPriceTp: offering.priceTp + margin,
-            finalPriceQd: offering.priceQd + margin,
-            finalPriceQt: offering.priceQt + margin,
+            admin_margin: margin,
+            final_price_double: offering.price_double * (1 + margin / 100),
+            final_price_triple: offering.price_triple * (1 + margin / 100),
+            final_price_quad: offering.price_quad * (1 + margin / 100),
+            final_price_quint: offering.price_quint * (1 + margin / 100),
           }
         : offering
     ));
