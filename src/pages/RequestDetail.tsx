@@ -60,6 +60,8 @@ const RequestDetail: React.FC = () => {
     );
   };
 
+  const requestOfferings = offerings.filter(offer => offer.requestId === requestId);
+
   const handleSubmitOffer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !requestId) return;
@@ -106,6 +108,82 @@ const RequestDetail: React.FC = () => {
             <p className="text-muted-foreground">Request details and offering</p>
           </div>
         </div>
+
+        {/* Travel Agent - View Offerings */}
+        {currentProfile?.role === 'travel_agent' && (
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground">Hotel Offerings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {requestOfferings.length > 0 ? (
+                <div className="space-y-4">
+                  {requestOfferings.map((offering) => (
+                    <div key={offering.id} className="p-4 border border-border rounded-lg bg-background">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-semibold text-foreground">{offering.hotelName}</h4>
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                          {offering.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        {request.roomDb > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Double ({request.roomDb} rooms):</span>
+                            <span className="font-medium text-foreground">{offering.finalPriceDb} SAR/night</span>
+                          </div>
+                        )}
+                        {request.roomTp > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Triple ({request.roomTp} rooms):</span>
+                            <span className="font-medium text-foreground">{offering.finalPriceTp} SAR/night</span>
+                          </div>
+                        )}
+                        {request.roomQd > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Quad ({request.roomQd} rooms):</span>
+                            <span className="font-medium text-foreground">{offering.finalPriceQd} SAR/night</span>
+                          </div>
+                        )}
+                        {request.roomQt > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Quint ({request.roomQt} rooms):</span>
+                            <span className="font-medium text-foreground">{offering.finalPriceQt} SAR/night</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-3 pt-3 border-t border-border">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">
+                            Submitted on {new Date(offering.createdAt).toLocaleDateString()}
+                          </span>
+                          {offering.status === 'PENDING' && (
+                            <Button 
+                              size="sm" 
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                              onClick={() => {
+                                // TODO: Implement accept offering functionality
+                                console.log('Accept offering:', offering.id);
+                              }}
+                            >
+                              Accept Offer
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-muted-foreground">No offerings have been submitted for this request yet.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Request Details */}
