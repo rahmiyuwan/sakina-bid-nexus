@@ -8,7 +8,7 @@ import { Calendar, Users, MapPin, X, Building2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MyBids: React.FC = () => {
-  const { currentUser, requests, offerings, refreshOfferings } = useApp();
+  const { currentUser, currentProfile, requests, offerings, refreshOfferings } = useApp();
   const { toast } = useToast();
 
   const userOfferings = offerings.filter(offer => offer.provider_user_id === currentUser?.id);
@@ -49,9 +49,9 @@ const MyBids: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">My Bids</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Bids I Have Submitted</h1>
             <p className="text-muted-foreground">
-              Manage all your submitted hotel offers
+              Manage your submitted hotel offers and track their status
             </p>
           </div>
         </div>
@@ -135,9 +135,11 @@ const MyBids: React.FC = () => {
                               <div className="text-sm text-muted-foreground">
                                 per night
                               </div>
-                              <div className="text-xs text-primary font-medium">
-                                Final: {myOffering.final_price_double} SAR
-                              </div>
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') && (
+                                <div className="text-xs text-primary font-medium">
+                                  Final: {myOffering.final_price_double} SAR
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -157,9 +159,11 @@ const MyBids: React.FC = () => {
                               <div className="text-sm text-muted-foreground">
                                 per night
                               </div>
-                              <div className="text-xs text-primary font-medium">
-                                Final: {myOffering.final_price_triple} SAR
-                              </div>
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') && (
+                                <div className="text-xs text-primary font-medium">
+                                  Final: {myOffering.final_price_triple} SAR
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -179,9 +183,11 @@ const MyBids: React.FC = () => {
                               <div className="text-sm text-muted-foreground">
                                 per night
                               </div>
-                              <div className="text-xs text-primary font-medium">
-                                Final: {myOffering.final_price_quad} SAR
-                              </div>
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') && (
+                                <div className="text-xs text-primary font-medium">
+                                  Final: {myOffering.final_price_quad} SAR
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -201,9 +207,11 @@ const MyBids: React.FC = () => {
                               <div className="text-sm text-muted-foreground">
                                 per night
                               </div>
-                              <div className="text-xs text-primary font-medium">
-                                Final: {myOffering.final_price_quint} SAR
-                              </div>
+                              {(currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') && (
+                                <div className="text-xs text-primary font-medium">
+                                  Final: {myOffering.final_price_quint} SAR
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
