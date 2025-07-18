@@ -319,7 +319,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Update request status to CONFIRMED
     setRequests(prev => prev.map(request => 
       request.id === requestId 
-        ? { ...request, status: 'CONFIRMED' as const }
+        ? { ...request, status: 'Confirmed' as const }
         : request
     ));
   };

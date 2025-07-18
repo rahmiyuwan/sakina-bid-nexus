@@ -63,7 +63,7 @@ const NewRequest: React.FC = () => {
         roomTp: parseInt(formData.room_triple) || 0,
         roomQd: parseInt(formData.room_quad) || 0,
         roomQt: parseInt(formData.room_quint) || 0,
-        status: 'PENDING' as const,
+        status: 'Submitted' as const,
         travelUserId: currentProfile.workspace_id,
       };
 

@@ -13,7 +13,7 @@ export interface UserProfile {
   updated_at: string;
 }
 
-export type RequestStatus = 'PENDING' | 'BIDDING' | 'CONFIRMED' | 'CANCELED';
+export type RequestStatus = 'Submitted' | 'Quoted' | 'Confirmed';
 export type OfferingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELED';
 
 export interface User {

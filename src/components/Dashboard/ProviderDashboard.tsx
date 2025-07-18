@@ -20,7 +20,7 @@ const ProviderDashboard: React.FC = () => {
   });
 
   const userOfferings = offerings.filter(offer => offer.providerUserId === currentUser?.id);
-  const pendingRequests = requests.filter(req => req.status === 'PENDING' || req.status === 'BIDDING');
+  const pendingRequests = requests.filter(req => req.status === 'Submitted' || req.status === 'Quoted');
   const pendingOfferings = userOfferings.filter(offer => offer.status === 'PENDING');
   const confirmedOfferings = userOfferings.filter(offer => offer.status === 'CONFIRMED');
 

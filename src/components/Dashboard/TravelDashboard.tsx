@@ -28,8 +28,8 @@ const TravelDashboard: React.FC = () => {
   });
 
   const userRequests = requests.filter(req => req.travelUserId === currentUser?.id);
-  const pendingRequests = userRequests.filter(req => req.status === 'PENDING');
-  const confirmedRequests = userRequests.filter(req => req.status === 'CONFIRMED');
+  const pendingRequests = userRequests.filter(req => req.status === 'Submitted');
+  const confirmedRequests = userRequests.filter(req => req.status === 'Confirmed');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +47,7 @@ const TravelDashboard: React.FC = () => {
       roomTp: parseInt(formData.roomTp) || 0,
       roomQd: parseInt(formData.roomQd) || 0,
       roomQt: parseInt(formData.roomQt) || 0,
-      status: 'PENDING',
+      status: 'Submitted',
       travelUserId: currentUser.id,
     };
 

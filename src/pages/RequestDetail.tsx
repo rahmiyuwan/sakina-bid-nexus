@@ -41,11 +41,11 @@ const RequestDetail: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PENDING':
+      case 'Submitted':
         return 'bg-blue-100 text-blue-800';
-      case 'BIDDING':
+      case 'Quoted':
         return 'bg-yellow-100 text-yellow-800';
-      case 'CONFIRMED':
+      case 'Confirmed':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -87,7 +87,7 @@ const RequestDetail: React.FC = () => {
   };
 
   const canSubmitOffer = currentProfile?.role === 'hotel_provider' && 
-                        (request.status === 'PENDING' || request.status === 'BIDDING') && 
+                        (request.status === 'Submitted' || request.status === 'Quoted') && 
                         !hasExistingOffer();
 
   return (

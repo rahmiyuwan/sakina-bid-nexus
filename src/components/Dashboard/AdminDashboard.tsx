@@ -12,8 +12,8 @@ const AdminDashboard: React.FC = () => {
   const [marginEdits, setMarginEdits] = useState<{[key: string]: string}>({});
 
   const totalRequests = requests.length;
-  const pendingRequests = requests.filter(req => req.status === 'PENDING').length;
-  const confirmedRequests = requests.filter(req => req.status === 'CONFIRMED').length;
+  const pendingRequests = requests.filter(req => req.status === 'Submitted').length;
+  const confirmedRequests = requests.filter(req => req.status === 'Confirmed').length;
   const totalOfferings = offerings.length;
   const confirmedOfferings = offerings.filter(offer => offer.status === 'CONFIRMED');
   
@@ -28,8 +28,10 @@ const AdminDashboard: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'Submitted': return 'bg-blue-100 text-blue-800';
+      case 'Quoted': return 'bg-yellow-100 text-yellow-800';
+      case 'Confirmed': return 'bg-green-100 text-green-800';
       case 'PENDING': return 'bg-yellow-100 text-yellow-800';
-      case 'BIDDING': return 'bg-blue-100 text-blue-800';
       case 'CONFIRMED': return 'bg-green-100 text-green-800';
       case 'CANCELED': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
