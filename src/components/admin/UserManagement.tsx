@@ -249,12 +249,11 @@ const UserManagement: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="workspace">Workspace (optional for admin/super_admin)</Label>
-                <Select value={formData.workspace_id} onValueChange={(value) => setFormData({ ...formData, workspace_id: value })}>
+                <Select value={formData.workspace_id || undefined} onValueChange={(value) => setFormData({ ...formData, workspace_id: value || '' })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select workspace" />
+                    <SelectValue placeholder="Select workspace (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No workspace</SelectItem>
                     {workspaces.map((workspace) => (
                       <SelectItem key={workspace.id} value={workspace.id}>
                         {workspace.name}
