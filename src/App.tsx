@@ -19,6 +19,7 @@ import Users from "./pages/Users";
 import Workspaces from "./pages/Workspaces";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
+import MyBids from "./pages/MyBids";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +37,7 @@ const App = () => (
             <Route path="/requests" element={<Requests />} />
             <Route path="/requests/new" element={<NewRequest />} />
             <Route path="/requests/:requestId" element={<RequestDetail />} />
-            <Route path="/bids" element={<Requests />} />
+            <Route path="/bids" element={<MyBids />} />
             <Route path="/hotels" element={<Hotels />} />
             <Route path="/commissions" element={<Commissions />} />
             <Route path="/settings" element={<Settings />} />
