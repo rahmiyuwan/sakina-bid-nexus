@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Calendar, Users, MapPin, Building2, Clock } from 'lucide-react';
 import { HotelOffering } from '@/types';
@@ -13,7 +14,7 @@ import { HotelOffering } from '@/types';
 const RequestDetail: React.FC = () => {
   const { requestId } = useParams<{ requestId: string }>();
   const navigate = useNavigate();
-  const { requests, currentUser, currentProfile, addOffering, offerings } = useApp();
+  const { requests, currentUser, currentProfile, addOffering, offerings, hotels } = useApp();
   
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerData, setOfferData] = useState({
@@ -254,13 +255,41 @@ const RequestDetail: React.FC = () => {
                   <form onSubmit={handleSubmitOffer} className="space-y-4">
                     <div>
                       <Label htmlFor="hotelName">Hotel Name</Label>
-                      <Input 
-                        id="hotelName" 
-                        value={offerData.hotelName}
-                        onChange={(e) => setOfferData({...offerData, hotelName: e.target.value})}
-                        placeholder="Enter your hotel name"
-                        required 
-                      />
+                      <Select 
+                        value={offerData.hotelName} 
+                        onValueChange={(value) => setOfferData({...offerData, hotelName: value})}
+                        required
+                      >
+                        <SelectTrigger className="bg-background border-input">
+                          <SelectValue placeholder="Select a hotel" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-border shadow-lg z-50">
+                          {hotels
+                            .filter(hotel => hotel.city === request.city)
+                            .map((hotel) => (
+                              <SelectItem 
+                                key={hotel.id} 
+                                value={hotel.name}
+                                className="hover:bg-muted focus:bg-muted"
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{hotel.name}</span>
+                                  {hotel.rating && (
+                                    <span className="text-xs text-muted-foreground">
+                                      {hotel.rating} stars
+                                      {hotel.distance_to_haram && ` • ${hotel.distance_to_haram}m from Haram`}
+                                    </span>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          {hotels.filter(hotel => hotel.city === request.city).length === 0 && (
+                            <SelectItem value="" disabled>
+                              No hotels available for {request.city}
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="space-y-3">
