@@ -72,7 +72,7 @@ export type Database = {
           created_at: string
           description: string | null
           distance_to_haram: number | null
-          facilities: Json | null
+          facilities: string | null
           id: string
           name: string
           rating: number | null
@@ -84,7 +84,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           distance_to_haram?: number | null
-          facilities?: Json | null
+          facilities?: string | null
           id?: string
           name: string
           rating?: number | null
@@ -96,7 +96,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           distance_to_haram?: number | null
-          facilities?: Json | null
+          facilities?: string | null
           id?: string
           name?: string
           rating?: number | null
