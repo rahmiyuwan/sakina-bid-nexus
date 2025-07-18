@@ -54,7 +54,7 @@ const Requests: React.FC = () => {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">Request Management</h2>
-            {currentProfile?.role === 'travel_agent' && (
+            {(currentProfile?.role === 'travel_agent' || currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') && (
               <Button asChild>
                 <Link to="/requests/new">
                   <Plus className="h-4 w-4 mr-2" />
