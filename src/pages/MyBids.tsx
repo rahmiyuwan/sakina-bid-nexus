@@ -228,9 +228,6 @@ const MyBids: React.FC = () => {
                           minute: '2-digit'
                         })}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        <span className="font-medium">Admin Margin:</span> {myOffering.admin_margin}%
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
