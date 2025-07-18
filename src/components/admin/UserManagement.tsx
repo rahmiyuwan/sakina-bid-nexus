@@ -11,22 +11,47 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { userService } from '@/services/userService';
 import { workspaceService } from '@/services/workspaceService';
-import type { User, CreateUser, UpdateUser, Workspace, UserRole } from '@/types/database';
+import type { Workspace } from '@/types/database';
+
+type UserRole = 'travel_agent' | 'hotel_provider' | 'admin' | 'super_admin';
+
+type Profile = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  role: UserRole;
+  workspace_id: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  workspace?: Workspace;
+};
+
+type CreateProfile = {
+  username: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  role: UserRole;
+  workspace_id: string | null;
+  is_active: boolean;
+};
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<Profile[]>([]);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState<CreateUser>({
+  const [editingUser, setEditingUser] = useState<Profile | null>(null);
+  const [formData, setFormData] = useState<CreateProfile>({
     username: '',
-    password: '',
-    role: 'travel_agent',
-    workspace_id: '',
     full_name: '',
     email: '',
     phone: '',
+    role: 'travel_agent',
+    workspace_id: null,
     is_active: true
   });
   const { toast } = useToast();
@@ -67,16 +92,11 @@ const UserManagement: React.FC = () => {
     try {
       const userData = {
         ...formData,
-        workspace_id: formData.workspace_id || undefined
+        workspace_id: formData.workspace_id || null
       };
 
       if (editingUser) {
-        // For updates, remove password if empty
-        const updateData: UpdateUser = { ...userData };
-        if (!formData.password) {
-          delete (updateData as any).password;
-        }
-        await userService.update(editingUser.id, updateData);
+        await userService.update(editingUser.id, userData);
         toast({
           title: "Success",
           description: "User updated successfully"
@@ -101,15 +121,14 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleEdit = (user: User) => {
+  const handleEdit = (user: Profile) => {
     setEditingUser(user);
     setFormData({
-      username: user.username,
-      password: '', // Don't populate password for security
+      username: user.username || '',
       role: user.role,
-      workspace_id: user.workspace_id || '',
-      full_name: user.full_name,
-      email: user.email,
+      workspace_id: user.workspace_id,
+      full_name: user.full_name || '',
+      email: user.email || '',
       phone: user.phone || '',
       is_active: user.is_active
     });
@@ -138,12 +157,11 @@ const UserManagement: React.FC = () => {
   const resetForm = () => {
     setFormData({
       username: '',
-      password: '',
-      role: 'travel_agent',
-      workspace_id: '',
       full_name: '',
       email: '',
       phone: '',
+      role: 'travel_agent',
+      workspace_id: null,
       is_active: true
     });
     setEditingUser(null);
@@ -188,28 +206,16 @@ const UserManagement: React.FC = () => {
                 <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
-                  value={formData.username}
+                  value={formData.username || ''}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   required
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">
-                  Password {editingUser && '(leave empty to keep current)'}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required={!editingUser}
                 />
               </div>
               <div>
                 <Label htmlFor="full_name">Full Name</Label>
                 <Input
                   id="full_name"
-                  value={formData.full_name}
+                  value={formData.full_name || ''}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   required
                 />
@@ -219,7 +225,7 @@ const UserManagement: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  value={formData.email}
+                  value={formData.email || ''}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                 />
@@ -228,7 +234,7 @@ const UserManagement: React.FC = () => {
                 <Label htmlFor="phone">Phone</Label>
                 <Input
                   id="phone"
-                  value={formData.phone}
+                  value={formData.phone || ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
@@ -249,7 +255,7 @@ const UserManagement: React.FC = () => {
               </div>
               <div>
                 <Label htmlFor="workspace">Workspace (optional for admin/super_admin)</Label>
-                <Select value={formData.workspace_id || undefined} onValueChange={(value) => setFormData({ ...formData, workspace_id: value || '' })}>
+                <Select value={formData.workspace_id || undefined} onValueChange={(value) => setFormData({ ...formData, workspace_id: value || null })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select workspace (optional)" />
                   </SelectTrigger>

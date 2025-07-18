@@ -63,7 +63,7 @@ const CommissionManagement: React.FC = () => {
   const loadAdmins = async () => {
     try {
       const data = await userService.getAll();
-      setAdmins(data.filter(u => u.role === 'admin' || u.role === 'super_admin'));
+      setAdmins(data.filter(u => u.role === 'admin' || u.role === 'super_admin') as any);
     } catch (error) {
       console.error('Failed to load admins:', error);
     }

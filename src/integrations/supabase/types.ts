@@ -50,13 +50,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "commissions_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "commissions_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
@@ -257,56 +250,6 @@ export type Database = {
           value_type?: Database["public"]["Enums"]["value_type"]
         }
         Relationships: []
-      }
-      users: {
-        Row: {
-          created_at: string
-          email: string
-          full_name: string
-          id: string
-          is_active: boolean
-          password: string
-          phone: string | null
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
-          username: string
-          workspace_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          full_name: string
-          id?: string
-          is_active?: boolean
-          password: string
-          phone?: string | null
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          username: string
-          workspace_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          full_name?: string
-          id?: string
-          is_active?: boolean
-          password?: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          username?: string
-          workspace_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "users_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       workspaces: {
         Row: {

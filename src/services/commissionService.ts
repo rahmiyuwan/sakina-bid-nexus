@@ -1,5 +1,19 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Commission, CreateCommission, UpdateCommission } from '@/types/database';
+import type { CreateCommission, UpdateCommission } from '@/types/database';
+
+type Commission = {
+  id: string;
+  request_id: string;
+  admin_id: string;
+  commission_double?: number;
+  commission_triple?: number;
+  commission_quad?: number;
+  commission_quint?: number;
+  created_at: string;
+  updated_at: string;
+  request?: any;
+  admin?: any;
+};
 
 export const commissionService = {
   async getAll(): Promise<Commission[]> {
@@ -8,7 +22,7 @@ export const commissionService = {
       .select(`
         *,
         request:requests(*),
-        admin:users(*)
+        admin:profiles(*)
       `)
       .order('created_at', { ascending: false });
     
@@ -22,7 +36,7 @@ export const commissionService = {
       .select(`
         *,
         request:requests(*),
-        admin:users(*)
+        admin:profiles(*)
       `)
       .eq('id', id)
       .single();
@@ -37,7 +51,7 @@ export const commissionService = {
       .select(`
         *,
         request:requests(*),
-        admin:users(*)
+        admin:profiles(*)
       `)
       .eq('request_id', requestId);
     
@@ -52,7 +66,7 @@ export const commissionService = {
       .select(`
         *,
         request:requests(*),
-        admin:users(*)
+        admin:profiles(*)
       `)
       .single();
     
@@ -68,7 +82,7 @@ export const commissionService = {
       .select(`
         *,
         request:requests(*),
-        admin:users(*)
+        admin:profiles(*)
       `)
       .single();
     

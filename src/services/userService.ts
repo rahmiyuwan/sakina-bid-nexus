@@ -1,10 +1,26 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { User, CreateUser, UpdateUser } from '@/types/database';
+
+type Profile = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  role: 'travel_agent' | 'hotel_provider' | 'admin' | 'super_admin';
+  workspace_id: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  workspace?: any;
+};
+
+type CreateProfile = Omit<Profile, 'id' | 'created_at' | 'updated_at' | 'workspace'>;
+type UpdateProfile = Partial<Omit<CreateProfile, 'id'>>;
 
 export const userService = {
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<Profile[]> {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .select(`
         *,
         workspace:workspaces(*)
@@ -15,24 +31,24 @@ export const userService = {
     return data || [];
   },
 
-  async getById(id: string): Promise<User | null> {
+  async getById(id: string): Promise<Profile | null> {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .select(`
         *,
         workspace:workspaces(*)
       `)
       .eq('id', id)
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
     return data;
   },
 
-  async create(user: CreateUser): Promise<User> {
+  async create(user: CreateProfile): Promise<Profile> {
     const { data, error } = await supabase
-      .from('users')
-      .insert(user)
+      .from('profiles')
+      .insert(user as any)
       .select(`
         *,
         workspace:workspaces(*)
@@ -43,9 +59,9 @@ export const userService = {
     return data;
   },
 
-  async update(id: string, user: UpdateUser): Promise<User> {
+  async update(id: string, user: UpdateProfile): Promise<Profile> {
     const { data, error } = await supabase
-      .from('users')
+      .from('profiles')
       .update(user)
       .eq('id', id)
       .select(`
@@ -60,7 +76,7 @@ export const userService = {
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase
-      .from('users')
+      .from('profiles')
       .delete()
       .eq('id', id);
     
