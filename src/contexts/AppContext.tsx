@@ -28,6 +28,7 @@ interface AppContextType {
   
   // Data fetching actions
   refreshRequests: () => Promise<void>;
+  refreshOfferings: () => Promise<void>;
   refreshHotels: () => Promise<void>;
   refreshSettings: () => Promise<void>;
   refreshWorkspaces: () => Promise<void>;
@@ -36,7 +37,7 @@ interface AppContextType {
   
   // Actions
   addRequest: (request: Omit<HotelRequest, 'id' | 'createdAt'>) => Promise<HotelRequest>;
-  addOffering: (offering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'>) => void;
+  addOffering: (offering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'>) => Promise<HotelOffering>;
   confirmOffering: (offeringId: string, requestId: string) => void;
   updateOfferingMargin: (offeringId: string, margin: number) => void;
 }
@@ -285,6 +286,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   useEffect(() => {
     if (currentProfile && !loading) {
       refreshRequests();
+      refreshOfferings();
       refreshHotels();
       refreshSettings();
       refreshWorkspaces();
@@ -293,18 +295,38 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   }, [currentProfile, loading]);
 
-  const addOffering = (offeringData: Omit<HotelOffering, 'id' | 'created_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint' | 'updated_at'>) => {
-    const newOffering: HotelOffering = {
-      ...offeringData,
-      id: generateId(),
-      final_price_double: offeringData.price_double * (1 + offeringData.admin_margin / 100),
-      final_price_triple: offeringData.price_triple * (1 + offeringData.admin_margin / 100),
-      final_price_quad: offeringData.price_quad * (1 + offeringData.admin_margin / 100),
-      final_price_quint: offeringData.price_quint * (1 + offeringData.admin_margin / 100),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    setOfferings(prev => [...prev, newOffering]);
+  const refreshOfferings = async () => {
+    try {
+      const { offeringService } = await import('@/services/offeringService');
+      const offerings = await offeringService.getAll();
+      setOfferings(offerings);
+    } catch (error) {
+      console.error('Error fetching offerings:', error);
+    }
+  };
+
+  const addOffering = async (offeringData: Omit<HotelOffering, 'id' | 'created_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint' | 'updated_at'>) => {
+    try {
+      const { offeringService } = await import('@/services/offeringService');
+      const createOffering = {
+        request_id: offeringData.request_id,
+        provider_user_id: offeringData.provider_user_id,
+        hotel_id: offeringData.hotel_id,
+        hotel_name: offeringData.hotel_name,
+        price_double: offeringData.price_double,
+        price_triple: offeringData.price_triple,
+        price_quad: offeringData.price_quad,
+        price_quint: offeringData.price_quint,
+        admin_margin: offeringData.admin_margin,
+      };
+      
+      const newOffering = await offeringService.create(createOffering);
+      setOfferings(prev => [...prev, newOffering]);
+      return newOffering;
+    } catch (error) {
+      console.error('Error creating offering:', error);
+      throw error;
+    }
   };
 
   const confirmOffering = (offeringId: string, requestId: string) => {
@@ -355,6 +377,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     commissions,
     dataLoading,
     refreshRequests,
+    refreshOfferings,
     refreshHotels,
     refreshSettings,
     refreshWorkspaces,

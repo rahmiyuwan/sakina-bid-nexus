@@ -24,24 +24,28 @@ const ProviderDashboard: React.FC = () => {
   const pendingOfferings = userOfferings.filter(offer => offer.status === 'PENDING');
   const confirmedOfferings = userOfferings.filter(offer => offer.status === 'CONFIRMED');
 
-  const handleSubmitOffer = (e: React.FormEvent) => {
+  const handleSubmitOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !selectedRequest) return;
 
-    const newOffering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'> = {
-      request_id: selectedRequest,
-      hotel_name: offerData.hotelName,
-      provider_user_id: currentUser.id,
-      hotel_id: '', // This should be set from hotel selection
-      price_double: parseFloat(offerData.priceDb) || 0,
-      price_triple: parseFloat(offerData.priceTp) || 0,
-      price_quad: parseFloat(offerData.priceQd) || 0,
-      price_quint: parseFloat(offerData.priceQt) || 0,
-      admin_margin: 10, // Default margin
-      status: 'PENDING',
-    };
+    try {
+      const newOffering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'> = {
+        request_id: selectedRequest,
+        hotel_name: offerData.hotelName,
+        provider_user_id: currentUser.id,
+        hotel_id: '', // This should be set from hotel selection
+        price_double: parseFloat(offerData.priceDb) || 0,
+        price_triple: parseFloat(offerData.priceTp) || 0,
+        price_quad: parseFloat(offerData.priceQd) || 0,
+        price_quint: parseFloat(offerData.priceQt) || 0,
+        admin_margin: 10, // Default margin
+        status: 'PENDING',
+      };
 
-    addOffering(newOffering);
+      await addOffering(newOffering);
+    } catch (error) {
+      console.error('Error submitting offer:', error);
+    }
     setOfferData({
       hotelName: '',
       priceDb: '',

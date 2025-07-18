@@ -62,7 +62,7 @@ const RequestDetail: React.FC = () => {
 
   const requestOfferings = offerings.filter(offer => offer.request_id === requestId);
 
-  const handleSubmitOffer = (e: React.FormEvent) => {
+  const handleSubmitOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !requestId) return;
 
@@ -73,20 +73,24 @@ const RequestDetail: React.FC = () => {
       return;
     }
 
-    const newOffering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'> = {
-      request_id: requestId,
-      provider_user_id: currentUser.id,
-      hotel_id: selectedHotel.id,
-      hotel_name: offerData.hotelName,
-      price_double: parseFloat(offerData.priceDb) || 0,
-      price_triple: parseFloat(offerData.priceTp) || 0,
-      price_quad: parseFloat(offerData.priceQd) || 0,
-      price_quint: parseFloat(offerData.priceQt) || 0,
-      admin_margin: 10, // Default margin
-      status: 'PENDING',
-    };
+    try {
+      const newOffering: Omit<HotelOffering, 'id' | 'created_at' | 'updated_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint'> = {
+        request_id: requestId,
+        provider_user_id: currentUser.id,
+        hotel_id: selectedHotel.id,
+        hotel_name: offerData.hotelName,
+        price_double: parseFloat(offerData.priceDb) || 0,
+        price_triple: parseFloat(offerData.priceTp) || 0,
+        price_quad: parseFloat(offerData.priceQd) || 0,
+        price_quint: parseFloat(offerData.priceQt) || 0,
+        admin_margin: 10, // Default margin
+        status: 'PENDING',
+      };
 
-    addOffering(newOffering);
+      await addOffering(newOffering);
+    } catch (error) {
+      console.error('Error submitting offer:', error);
+    }
     setOfferData({
       hotelName: '',
       priceDb: '',
