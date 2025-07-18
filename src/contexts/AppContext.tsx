@@ -308,6 +308,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const addOffering = async (offeringData: Omit<HotelOffering, 'id' | 'created_at' | 'final_price_double' | 'final_price_triple' | 'final_price_quad' | 'final_price_quint' | 'updated_at'>) => {
     try {
       const { offeringService } = await import('@/services/offeringService');
+      const { requestService } = await import('@/services/requestService');
+      
       const createOffering = {
         request_id: offeringData.request_id,
         provider_user_id: offeringData.provider_user_id,
@@ -321,6 +323,21 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       };
       
       const newOffering = await offeringService.create(createOffering);
+      
+      // Check if this is the first offering for this request
+      const existingOfferingsForRequest = offerings.filter(o => o.request_id === offeringData.request_id);
+      if (existingOfferingsForRequest.length === 0) {
+        // This is the first offering, update request status to "Quoted"
+        await requestService.update(offeringData.request_id, { status: 'Quoted' });
+        
+        // Update local state for request
+        setRequests(prev => prev.map(request => 
+          request.id === offeringData.request_id 
+            ? { ...request, status: 'Quoted' as const }
+            : request
+        ));
+      }
+      
       setOfferings(prev => [...prev, newOffering]);
       return newOffering;
     } catch (error) {
@@ -332,6 +349,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const confirmOffering = async (offeringId: string, requestId: string) => {
     try {
       const { offeringService } = await import('@/services/offeringService');
+      const { requestService } = await import('@/services/requestService');
       
       // Update selected offering to CONFIRMED
       await offeringService.update(offeringId, { status: 'CONFIRMED' });
@@ -343,6 +361,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           offeringService.update(offering.id, { status: 'CANCELED' })
         )
       );
+
+      // Update request status to "Confirmed" in database
+      await requestService.update(requestId, { status: 'Confirmed' });
 
       // Update local state
       setOfferings(prev => prev.map(offering => 
