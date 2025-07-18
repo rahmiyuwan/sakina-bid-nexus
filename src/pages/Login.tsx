@@ -47,7 +47,9 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       // Get all users and find matching username/password
+      console.log('Attempting to fetch users from database...');
       const users = await userService.getAll();
+      console.log('Fetched users:', users);
       const user = users.find(u => 
         u.username === formData.username && 
         u.password === formData.password &&
