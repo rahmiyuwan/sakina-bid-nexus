@@ -1,11 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User } from '@/types/database';
-import { HotelRequest, HotelOffering, UserRole, OfferingStatus, RequestStatus } from '@/types';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { HotelRequest, HotelOffering, UserRole, OfferingStatus, RequestStatus, UserProfile } from '@/types';
 
 interface AppContextType {
-  // User management
+  // Auth state
   currentUser: User | null;
-  setCurrentUser: (user: User | null) => void;
+  currentProfile: UserProfile | null;
+  session: Session | null;
+  loading: boolean;
+  
+  // Auth actions
+  signOut: () => Promise<void>;
   
   // Data state
   requests: HotelRequest[];
@@ -34,8 +40,75 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentProfile, setCurrentProfile] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<HotelRequest[]>([]);
   const [offerings, setOfferings] = useState<HotelOffering[]>([]);
+
+  // Auth effect
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setCurrentUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Fetch user profile
+          setTimeout(async () => {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+              
+              setCurrentProfile(profile);
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            }
+          }, 0);
+        } else {
+          setCurrentProfile(null);
+        }
+        
+        setLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setCurrentUser(session?.user ?? null);
+      
+      if (session?.user) {
+        // Fetch user profile
+        setTimeout(async () => {
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            setCurrentProfile(profile);
+          } catch (error) {
+            console.error('Error fetching profile:', error);
+          }
+          setLoading(false);
+        }, 0);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -96,7 +169,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const value: AppContextType = {
     currentUser,
-    setCurrentUser,
+    currentProfile,
+    session,
+    loading,
+    signOut,
     requests,
     offerings,
     addRequest,

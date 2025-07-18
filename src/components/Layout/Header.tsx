@@ -4,10 +4,10 @@ import { LogOut, Bell } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 const Header: React.FC = () => {
-  const { currentUser, setCurrentUser } = useApp();
+  const { currentUser, currentProfile, signOut } = useApp();
 
-  const handleLogout = () => {
-    setCurrentUser(null);
+  const handleLogout = async () => {
+    await signOut();
   };
 
   const getRoleDisplayName = (role: string) => {
@@ -49,10 +49,10 @@ const Header: React.FC = () => {
               
               <div className="text-right">
                 <p className="text-sm font-medium text-foreground">
-                  {currentUser.full_name}
+                  {currentProfile?.full_name || currentUser.email}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {getRoleDisplayName(currentUser.role)}
+                  {currentProfile?.role ? getRoleDisplayName(currentProfile.role) : 'User'}
                 </p>
               </div>
               

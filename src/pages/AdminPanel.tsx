@@ -12,9 +12,9 @@ import CommissionManagement from '@/components/admin/CommissionManagement';
 
 const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState('workspaces');
-  const { currentUser } = useApp();
+  const { currentUser, currentProfile } = useApp();
 
-  if (!currentUser || currentUser.role !== 'super_admin') {
+  if (!currentUser || !currentProfile || currentProfile.role !== 'super_admin') {
     return <Navigate to="/" replace />;
   }
 
