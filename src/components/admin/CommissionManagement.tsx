@@ -90,9 +90,11 @@ const CommissionManagement: React.FC = () => {
 
     Object.entries(offeringsByRequest).forEach(([requestId, requestOfferings]) => {
       const request = requests.find(r => r.id === requestId);
-      const workspace = workspaces.find(w => w.id === request?.travelUserId); // HotelRequest uses travelUserId
       
-      if (!request || requestOfferings.length === 0) return;
+      // Only show confirmed requests
+      if (!request || request.status !== 'Confirmed' || requestOfferings.length === 0) return;
+
+      const workspace = workspaces.find(w => w.id === request.travelUserId); // HotelRequest uses travelUserId
 
       // Calculate totals for each offering in this request
       requestOfferings.forEach(offering => {
