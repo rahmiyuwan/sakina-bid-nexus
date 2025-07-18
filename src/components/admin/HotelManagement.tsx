@@ -22,7 +22,7 @@ const HotelManagement: React.FC = () => {
     city: 'Makkah',
     address: '',
     rating: 1,
-    facilities: null,
+    facilities: '',
     distance_to_haram: 0,
     description: ''
   });
@@ -53,19 +53,14 @@ const HotelManagement: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const hotelData = {
-        ...formData,
-        facilities: formData.facilities ? JSON.parse(formData.facilities as string) : null
-      };
-
       if (editingHotel) {
-        await hotelService.update(editingHotel.id, hotelData);
+        await hotelService.update(editingHotel.id, formData);
         toast({
           title: "Success",
           description: "Hotel updated successfully"
         });
       } else {
-        await hotelService.create(hotelData);
+        await hotelService.create(formData);
         toast({
           title: "Success",
           description: "Hotel created successfully"
@@ -91,7 +86,7 @@ const HotelManagement: React.FC = () => {
       city: hotel.city,
       address: hotel.address || '',
       rating: hotel.rating || 1,
-      facilities: hotel.facilities ? JSON.stringify(hotel.facilities) : '',
+      facilities: hotel.facilities || '',
       distance_to_haram: hotel.distance_to_haram || 0,
       description: hotel.description || ''
     });
@@ -123,7 +118,7 @@ const HotelManagement: React.FC = () => {
       city: 'Makkah',
       address: '',
       rating: 1,
-      facilities: null,
+      facilities: '',
       distance_to_haram: 0,
       description: ''
     });
@@ -216,12 +211,12 @@ const HotelManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="facilities">Facilities (JSON format)</Label>
+                <Label htmlFor="facilities">Facilities</Label>
                 <Textarea
                   id="facilities"
                   value={formData.facilities as string || ''}
                   onChange={(e) => setFormData({ ...formData, facilities: e.target.value })}
-                  placeholder='["WiFi", "AC", "Restaurant"]'
+                  placeholder="WiFi, AC, Restaurant, Pool, Gym"
                 />
               </div>
               <div>
@@ -251,8 +246,8 @@ const HotelManagement: React.FC = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>City</TableHead>
                 <TableHead>Rating</TableHead>
+                <TableHead>Facilities</TableHead>
                 <TableHead>Distance to Haram</TableHead>
-                <TableHead>Created At</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -269,10 +264,12 @@ const HotelManagement: React.FC = () => {
                     ) : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    {hotel.distance_to_haram ? `${hotel.distance_to_haram}m` : 'N/A'}
+                    <div className="max-w-xs truncate">
+                      {hotel.facilities || 'N/A'}
+                    </div>
                   </TableCell>
                   <TableCell>
-                    {new Date(hotel.created_at).toLocaleDateString()}
+                    {hotel.distance_to_haram ? `${hotel.distance_to_haram}m` : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
