@@ -180,7 +180,43 @@ const RequestDetail: React.FC = () => {
                             </span>
                           </div>
                         )}
-                      </div>
+                       </div>
+                       
+                       {/* Total Expense Estimation */}
+                       <div className="mt-3 p-3 bg-muted/30 rounded-lg">
+                         <div className="text-sm font-medium text-muted-foreground mb-1">Total Expense Estimation:</div>
+                         <div className="text-lg font-bold text-primary">
+                           {(() => {
+                             const checkInDate = new Date(request.checkIn);
+                             const checkOutDate = new Date(request.checkOut);
+                             const numberOfNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+                             
+                             const totalCost = 
+                               (request.roomDb * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                 ? offering.final_price_double 
+                                 : offering.price_double) * numberOfNights) +
+                               (request.roomTp * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                 ? offering.final_price_triple 
+                                 : offering.price_triple) * numberOfNights) +
+                               (request.roomQd * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                 ? offering.final_price_quad 
+                                 : offering.price_quad) * numberOfNights) +
+                               (request.roomQt * ((currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin') 
+                                 ? offering.final_price_quint 
+                                 : offering.price_quint) * numberOfNights);
+                             
+                             return `${totalCost.toFixed(2)} SAR`;
+                           })()}
+                         </div>
+                         <div className="text-xs text-muted-foreground">
+                           For {(() => {
+                             const checkInDate = new Date(request.checkIn);
+                             const checkOutDate = new Date(request.checkOut);
+                             const numberOfNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+                             return numberOfNights;
+                           })()} nights
+                         </div>
+                       </div>
                       
                       <div className="mt-3 pt-3 border-t border-border">
                         <div className="flex justify-between items-center">
