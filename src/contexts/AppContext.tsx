@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { HotelRequest, HotelOffering, UserRole, OfferingStatus, RequestStatus, UserProfile } from '@/types';
+import type { Hotel, Setting, Workspace } from '@/types/database';
 
 interface AppContextType {
   // Auth state
@@ -16,6 +17,22 @@ interface AppContextType {
   // Data state
   requests: HotelRequest[];
   offerings: HotelOffering[];
+  hotels: Hotel[];
+  settings: Setting[];
+  workspaces: Workspace[];
+  users: UserProfile[];
+  commissions: any[];
+  
+  // Loading states
+  dataLoading: boolean;
+  
+  // Data fetching actions
+  refreshRequests: () => Promise<void>;
+  refreshHotels: () => Promise<void>;
+  refreshSettings: () => Promise<void>;
+  refreshWorkspaces: () => Promise<void>;
+  refreshUsers: () => Promise<void>;
+  refreshCommissions: () => Promise<void>;
   
   // Actions
   addRequest: (request: Omit<HotelRequest, 'id' | 'createdAt'>) => Promise<HotelRequest>;
@@ -43,8 +60,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [currentProfile, setCurrentProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
   const [requests, setRequests] = useState<HotelRequest[]>([]);
   const [offerings, setOfferings] = useState<HotelOffering[]>([]);
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [settings, setSettings] = useState<Setting[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [commissions, setCommissions] = useState<any[]>([]);
 
   // Auth effect
   useEffect(() => {
@@ -159,6 +182,117 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
+  // Data fetching functions
+  const refreshRequests = async () => {
+    try {
+      setDataLoading(true);
+      const { requestService } = await import('@/services/requestService');
+      const dbRequests = await requestService.getAll();
+      
+      // Convert database format to app format
+      const formattedRequests: HotelRequest[] = dbRequests.map(req => ({
+        id: req.id,
+        travelName: req.travel_name,
+        tlName: req.tour_leader,
+        paxCount: req.pax,
+        city: req.city,
+        packageType: req.package_type,
+        checkIn: req.check_in_date,
+        checkOut: req.check_out_date,
+        roomDb: req.room_double,
+        roomTp: req.room_triple,
+        roomQd: req.room_quad,
+        roomQt: req.room_quint,
+        status: req.status as RequestStatus,
+        travelUserId: req.travel_workspace_id,
+        createdAt: req.created_at,
+      }));
+      
+      setRequests(formattedRequests);
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const refreshHotels = async () => {
+    try {
+      const { hotelService } = await import('@/services/hotelService');
+      const hotels = await hotelService.getAll();
+      setHotels(hotels);
+    } catch (error) {
+      console.error('Error fetching hotels:', error);
+    }
+  };
+
+  const refreshSettings = async () => {
+    try {
+      const { settingService } = await import('@/services/settingService');
+      const settings = await settingService.getAll();
+      setSettings(settings);
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+  };
+
+  const refreshWorkspaces = async () => {
+    try {
+      const { workspaceService } = await import('@/services/workspaceService');
+      const workspaces = await workspaceService.getAll();
+      setWorkspaces(workspaces);
+    } catch (error) {
+      console.error('Error fetching workspaces:', error);
+    }
+  };
+
+  const refreshUsers = async () => {
+    try {
+      const { userService } = await import('@/services/userService');
+      const profiles = await userService.getAll();
+      
+      // Convert to UserProfile format
+      const formattedUsers: UserProfile[] = profiles.map(profile => ({
+        id: profile.id,
+        username: profile.username,
+        full_name: profile.full_name,
+        email: profile.email,
+        phone: profile.phone,
+        role: profile.role,
+        workspace_id: profile.workspace_id,
+        is_active: profile.is_active,
+        created_at: profile.created_at,
+        updated_at: profile.updated_at,
+      }));
+      
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const refreshCommissions = async () => {
+    try {
+      const { commissionService } = await import('@/services/commissionService');
+      const commissions = await commissionService.getAll();
+      setCommissions(commissions);
+    } catch (error) {
+      console.error('Error fetching commissions:', error);
+    }
+  };
+
+  // Load initial data when user is authenticated
+  useEffect(() => {
+    if (currentProfile && !loading) {
+      refreshRequests();
+      refreshHotels();
+      refreshSettings();
+      refreshWorkspaces();
+      refreshUsers();
+      refreshCommissions();
+    }
+  }, [currentProfile, loading]);
+
   const addOffering = (offeringData: Omit<HotelOffering, 'id' | 'createdAt' | 'finalPriceDb' | 'finalPriceTp' | 'finalPriceQd' | 'finalPriceQt'>) => {
     const newOffering: HotelOffering = {
       ...offeringData,
@@ -213,6 +347,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     signOut,
     requests,
     offerings,
+    hotels,
+    settings,
+    workspaces,
+    users,
+    commissions,
+    dataLoading,
+    refreshRequests,
+    refreshHotels,
+    refreshSettings,
+    refreshWorkspaces,
+    refreshUsers,
+    refreshCommissions,
     addRequest,
     addOffering,
     confirmOffering,

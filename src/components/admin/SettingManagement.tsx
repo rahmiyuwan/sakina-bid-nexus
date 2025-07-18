@@ -10,12 +10,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
 import { settingService } from '@/services/settingService';
 import type { Setting, CreateSetting, UpdateSetting, ValueType } from '@/types/database';
 
 const SettingManagement: React.FC = () => {
-  const [settings, setSettings] = useState<Setting[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { settings, refreshSettings } = useApp();
+  const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSetting, setEditingSetting] = useState<Setting | null>(null);
   const [formData, setFormData] = useState<CreateSetting>({
@@ -31,23 +32,9 @@ const SettingManagement: React.FC = () => {
   const valueTypes: ValueType[] = ['decimal', 'integer', 'string', 'boolean', 'json'];
 
   useEffect(() => {
-    loadSettings();
+    refreshSettings();
   }, []);
 
-  const loadSettings = async () => {
-    try {
-      const data = await settingService.getAll();
-      setSettings(data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load settings",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +52,7 @@ const SettingManagement: React.FC = () => {
           description: "Setting created successfully"
         });
       }
-      setDialogOpen(false);
-      setEditingSetting(null);
-      resetForm();
-      loadSettings();
+      refreshSettings();
     } catch (error) {
       toast({
         title: "Error",
@@ -100,7 +84,7 @@ const SettingManagement: React.FC = () => {
         title: "Success",
         description: "Setting deleted successfully"
       });
-      loadSettings();
+      refreshSettings();
     } catch (error) {
       toast({
         title: "Error",
@@ -133,7 +117,7 @@ const SettingManagement: React.FC = () => {
     return colors[type];
   };
 
-  if (loading) {
+  if (loading || !settings) {
     return <div>Loading settings...</div>;
   }
 

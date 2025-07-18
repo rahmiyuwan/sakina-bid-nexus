@@ -8,16 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
 import { commissionService } from '@/services/commissionService';
 import { requestService } from '@/services/requestService';
-import { userService } from '@/services/userService';
 import type { Commission, CreateCommission, UpdateCommission, Request, User } from '@/types/database';
 
 const CommissionManagement: React.FC = () => {
-  const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [admins, setAdmins] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { commissions, requests, users, refreshCommissions } = useApp();
+  const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCommission, setEditingCommission] = useState<Commission | null>(null);
   const [formData, setFormData] = useState<CreateCommission>({
@@ -26,48 +24,16 @@ const CommissionManagement: React.FC = () => {
     commission_double: 0,
     commission_triple: 0,
     commission_quad: 0,
-    commission_quint: 0
+    commission_quint: 0,
   });
   const { toast } = useToast();
 
+  const admins = users.filter(u => u.role === 'admin' || u.role === 'super_admin');
+
   useEffect(() => {
-    loadCommissions();
-    loadRequests();
-    loadAdmins();
+    refreshCommissions();
   }, []);
 
-  const loadCommissions = async () => {
-    try {
-      const data = await commissionService.getAll();
-      setCommissions(data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load commissions",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadRequests = async () => {
-    try {
-      const data = await requestService.getAll();
-      setRequests(data);
-    } catch (error) {
-      console.error('Failed to load requests:', error);
-    }
-  };
-
-  const loadAdmins = async () => {
-    try {
-      const data = await userService.getAll();
-      setAdmins(data.filter(u => u.role === 'admin' || u.role === 'super_admin') as any);
-    } catch (error) {
-      console.error('Failed to load admins:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,8 +53,7 @@ const CommissionManagement: React.FC = () => {
       }
       setDialogOpen(false);
       setEditingCommission(null);
-      resetForm();
-      loadCommissions();
+      refreshCommissions();
     } catch (error) {
       toast({
         title: "Error",
@@ -120,7 +85,7 @@ const CommissionManagement: React.FC = () => {
         title: "Success",
         description: "Commission deleted successfully"
       });
-      loadCommissions();
+      refreshCommissions();
     } catch (error) {
       toast({
         title: "Error",
@@ -142,7 +107,7 @@ const CommissionManagement: React.FC = () => {
     setEditingCommission(null);
   };
 
-  if (loading) {
+  if (loading || !commissions) {
     return <div>Loading commissions...</div>;
   }
 
@@ -176,7 +141,7 @@ const CommissionManagement: React.FC = () => {
                   <SelectContent>
                     {requests.map((request) => (
                       <SelectItem key={request.id} value={request.id}>
-                        #{request.request_number} - {request.travel_name}
+                        #{request.id.slice(-6)} - {request.travelName}
                       </SelectItem>
                     ))}
                   </SelectContent>

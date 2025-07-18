@@ -9,16 +9,10 @@ import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Requests: React.FC = () => {
-  const { requests, currentProfile } = useApp();
-  const [loading, setLoading] = useState(true);
+  const { requests, currentProfile, dataLoading, refreshRequests } = useApp();
 
   useEffect(() => {
-    // Simulate loading time to allow context to initialize
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    refreshRequests();
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -34,7 +28,7 @@ const Requests: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (dataLoading) {
     return (
       <MainLayout>
         <PageLoadingSpinner message="Loading requests..." />

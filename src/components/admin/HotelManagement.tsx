@@ -9,12 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
 import { hotelService } from '@/services/hotelService';
 import type { Hotel, CreateHotel, UpdateHotel, CityType } from '@/types/database';
 
 const HotelManagement: React.FC = () => {
-  const [hotels, setHotels] = useState<Hotel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { hotels, refreshHotels } = useApp();
+  const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHotel, setEditingHotel] = useState<Hotel | null>(null);
   const [formData, setFormData] = useState<CreateHotel>({
@@ -32,23 +33,8 @@ const HotelManagement: React.FC = () => {
   const ratings = [1, 2, 3, 4, 5];
 
   useEffect(() => {
-    loadHotels();
+    refreshHotels();
   }, []);
-
-  const loadHotels = async () => {
-    try {
-      const data = await hotelService.getAll();
-      setHotels(data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load hotels",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +55,7 @@ const HotelManagement: React.FC = () => {
       setDialogOpen(false);
       setEditingHotel(null);
       resetForm();
-      loadHotels();
+      refreshHotels();
     } catch (error) {
       toast({
         title: "Error",
@@ -102,7 +88,7 @@ const HotelManagement: React.FC = () => {
         title: "Success",
         description: "Hotel deleted successfully"
       });
-      loadHotels();
+      refreshHotels();
     } catch (error) {
       toast({
         title: "Error",

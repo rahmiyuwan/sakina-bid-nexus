@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
 import { userService } from '@/services/userService';
-import { workspaceService } from '@/services/workspaceService';
 import type { Workspace } from '@/types/database';
 
 type UserRole = 'travel_agent' | 'hotel_provider' | 'admin' | 'super_admin';
@@ -40,9 +40,8 @@ type CreateProfile = {
 };
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<Profile[]>([]);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { users, workspaces, refreshUsers, refreshWorkspaces } = useApp();
+  const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [formData, setFormData] = useState<CreateProfile>({
@@ -59,33 +58,9 @@ const UserManagement: React.FC = () => {
   const userRoles: UserRole[] = ['travel_agent', 'hotel_provider', 'admin', 'super_admin'];
 
   useEffect(() => {
-    loadUsers();
-    loadWorkspaces();
+    refreshUsers();
+    refreshWorkspaces();
   }, []);
-
-  const loadUsers = async () => {
-    try {
-      const data = await userService.getAll();
-      setUsers(data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load users",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadWorkspaces = async () => {
-    try {
-      const data = await workspaceService.getAll();
-      setWorkspaces(data.filter(w => w.is_active));
-    } catch (error) {
-      console.error('Failed to load workspaces:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +86,7 @@ const UserManagement: React.FC = () => {
       setDialogOpen(false);
       setEditingUser(null);
       resetForm();
-      loadUsers();
+      refreshUsers();
     } catch (error) {
       toast({
         title: "Error",
@@ -144,7 +119,7 @@ const UserManagement: React.FC = () => {
         title: "Success",
         description: "User deleted successfully"
       });
-      loadUsers();
+      refreshUsers();
     } catch (error) {
       toast({
         title: "Error",
@@ -312,7 +287,7 @@ const UserManagement: React.FC = () => {
                       {user.role.replace('_', ' ').toUpperCase()}
                     </span>
                   </TableCell>
-                  <TableCell>{user.workspace?.name || 'None'}</TableCell>
+                  <TableCell>{user.workspace_id ? 'Yes' : 'None'}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'

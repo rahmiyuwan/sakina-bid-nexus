@@ -9,12 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
 import { workspaceService } from '@/services/workspaceService';
 import type { Workspace, CreateWorkspace, UpdateWorkspace } from '@/types/database';
 
 const WorkspaceManagement: React.FC = () => {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { workspaces, refreshWorkspaces } = useApp();
+  const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(null);
   const [formData, setFormData] = useState<CreateWorkspace>({
@@ -25,23 +26,8 @@ const WorkspaceManagement: React.FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    loadWorkspaces();
+    refreshWorkspaces();
   }, []);
-
-  const loadWorkspaces = async () => {
-    try {
-      const data = await workspaceService.getAll();
-      setWorkspaces(data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load workspaces",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +48,7 @@ const WorkspaceManagement: React.FC = () => {
       setDialogOpen(false);
       setEditingWorkspace(null);
       setFormData({ name: '', description: '', is_active: true });
-      loadWorkspaces();
+      refreshWorkspaces();
     } catch (error) {
       toast({
         title: "Error",
@@ -91,7 +77,7 @@ const WorkspaceManagement: React.FC = () => {
         title: "Success",
         description: "Workspace deleted successfully"
       });
-      loadWorkspaces();
+      refreshWorkspaces();
     } catch (error) {
       toast({
         title: "Error",
