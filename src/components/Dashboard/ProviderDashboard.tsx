@@ -27,7 +27,7 @@ const ProviderDashboard: React.FC = () => {
   );
   const requestsWithoutMyBids = requests.filter(req => 
     !userOfferings.some(offer => offer.request_id === req.id) && 
-    (req.status === 'Submitted' || req.status === 'Quoted')
+    req.status !== 'Confirmed'
   );
   const pendingOfferings = userOfferings.filter(offer => offer.status === 'PENDING');
   const confirmedOfferings = userOfferings.filter(offer => offer.status === 'CONFIRMED');
