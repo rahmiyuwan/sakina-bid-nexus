@@ -152,7 +152,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         room_quad: requestData.roomQd,
         room_quint: requestData.roomQt,
         travel_workspace_id: currentProfile?.workspace_id || '',
-        status: 'Submitted' as const,
+         status: 'Submitted' as const,
         bidding_deadline: new Date(new Date(requestData.checkIn).getTime() - 24 * 60 * 60 * 1000).toISOString(),
       });
 

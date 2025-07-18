@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import Dashboard from "./pages/Dashboard";
 import Requests from "./pages/Requests";
 import NewRequest from "./pages/NewRequest";
+import RequestDetail from "./pages/RequestDetail";
 import Hotels from "./pages/Hotels";
 import Commissions from "./pages/Commissions";
 import Settings from "./pages/Settings";
@@ -34,7 +35,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/requests" element={<Requests />} />
             <Route path="/requests/new" element={<NewRequest />} />
-            <Route path="/requests/:id" element={<Requests />} />
+            <Route path="/requests/:requestId" element={<RequestDetail />} />
             <Route path="/bids" element={<Requests />} />
             <Route path="/hotels" element={<Hotels />} />
             <Route path="/commissions" element={<Commissions />} />
