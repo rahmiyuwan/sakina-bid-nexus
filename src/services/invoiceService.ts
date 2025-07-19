@@ -44,11 +44,12 @@ const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => 
     let hotelName = 'No confirmed offering';
     
     if (offering) {
-      const dailyTotal = (offering.final_price_double || 0) + 
-                        (offering.final_price_triple || 0) + 
-                        (offering.final_price_quad || 0) + 
-                        (offering.final_price_quint || 0);
-      total = dailyTotal * nights;
+      // Use the same formula as "Total Expense Estimation" in RequestDetail
+      total = 
+        (request.roomDb * (offering.final_price_double || 0) * nights) +
+        (request.roomTp * (offering.final_price_triple || 0) * nights) +
+        (request.roomQd * (offering.final_price_quad || 0) * nights) +
+        (request.roomQt * (offering.final_price_quint || 0) * nights);
       hotelName = offering.hotel_name;
     }
     
@@ -168,15 +169,14 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
       const checkOutDate = new Date(request.checkOut);
       const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
       
-      // Sum all room type final prices for each confirmed offering
-      const dailyTotal = (offering.final_price_double || 0) + 
-                        (offering.final_price_triple || 0) + 
-                        (offering.final_price_quad || 0) + 
-                        (offering.final_price_quint || 0);
-      
-      const offeringTotal = dailyTotal * nights;
+      // Use the same formula as "Total Expense Estimation" in RequestDetail
+      const offeringTotal = 
+        (request.roomDb * (offering.final_price_double || 0) * nights) +
+        (request.roomTp * (offering.final_price_triple || 0) * nights) +
+        (request.roomQd * (offering.final_price_quad || 0) * nights) +
+        (request.roomQt * (offering.final_price_quint || 0) * nights);
       totalAmount += offeringTotal;
-      console.log(`Request ${request.id.slice(-6)}: Hotel=${offering.hotel_name}, Daily=SAR ${dailyTotal}, Nights=${nights}, Total=SAR ${offeringTotal}`);
+      console.log(`Request ${request.id.slice(-6)}: Hotel=${offering.hotel_name}, Rooms=(${request.roomDb}db,${request.roomTp}tp,${request.roomQd}qd,${request.roomQt}qt), Nights=${nights}, Total=SAR ${offeringTotal}`);
     } else {
       console.log(`Request ${request.id.slice(-6)}: No confirmed offering found`);
     }
