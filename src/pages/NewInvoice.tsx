@@ -243,16 +243,16 @@ const NewInvoice = () => {
                                       <div className="font-medium text-sm mb-2">Accepted Offering - {acceptedOffering.hotel_name}</div>
                                       <div className="grid grid-cols-2 gap-2 text-xs">
                                         {acceptedOffering.final_price_double > 0 && (
-                                          <div>Double: ${acceptedOffering.final_price_double}</div>
+                                          <div>Double: SAR {acceptedOffering.final_price_double}</div>
                                         )}
                                         {acceptedOffering.final_price_triple > 0 && (
-                                          <div>Triple: ${acceptedOffering.final_price_triple}</div>
+                                          <div>Triple: SAR {acceptedOffering.final_price_triple}</div>
                                         )}
                                         {acceptedOffering.final_price_quad > 0 && (
-                                          <div>Quad: ${acceptedOffering.final_price_quad}</div>
+                                          <div>Quad: SAR {acceptedOffering.final_price_quad}</div>
                                         )}
                                         {acceptedOffering.final_price_quint > 0 && (
-                                          <div>Quint: ${acceptedOffering.final_price_quint}</div>
+                                          <div>Quint: SAR {acceptedOffering.final_price_quint}</div>
                                         )}
                                       </div>
                                     </div>

@@ -128,7 +128,7 @@ const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => 
                    <div>Tour Leader: ${item.tlName}</div>
                  </td>
                  <td style="padding: 12px; text-align: right; color: #1e293b; font-weight: bold; font-size: 16px;">
-                   $${item.total.toFixed(2)}
+                   SAR ${item.total.toFixed(2)}
                  </td>
               </tr>
             `).join('')}
@@ -140,7 +140,7 @@ const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => 
       <div style="text-align: right; margin-bottom: 30px;">
         <div style="display: inline-block; background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 2px solid #e2e8f0;">
           <div style="color: #64748b; margin-bottom: 5px;">Total Amount:</div>
-          <div style="color: #1e293b; font-size: 24px; font-weight: bold;">$${grandTotal.toFixed(2)}</div>
+          <div style="color: #1e293b; font-size: 24px; font-weight: bold;">SAR ${grandTotal.toFixed(2)}</div>
         </div>
       </div>
 
@@ -176,13 +176,13 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
       
       const offeringTotal = dailyTotal * nights;
       totalAmount += offeringTotal;
-      console.log(`Request ${request.id.slice(-6)}: Hotel=${offering.hotel_name}, Daily=$${dailyTotal}, Nights=${nights}, Total=$${offeringTotal}`);
+      console.log(`Request ${request.id.slice(-6)}: Hotel=${offering.hotel_name}, Daily=SAR ${dailyTotal}, Nights=${nights}, Total=SAR ${offeringTotal}`);
     } else {
       console.log(`Request ${request.id.slice(-6)}: No confirmed offering found`);
     }
   });
   
-  console.log(`Final invoice total: $${totalAmount} for ${requests.length} requests`);
+  console.log(`Final invoice total: SAR ${totalAmount} for ${requests.length} requests`);
 
   // Save invoice to database
   const { data: savedInvoice, error: saveError } = await supabase
@@ -203,7 +203,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
     throw new Error('Failed to save invoice record');
   }
 
-  console.log(`Database saved total: $${totalAmount}, Saved invoice:`, savedInvoice);
+  console.log(`Database saved total: SAR ${totalAmount}, Saved invoice:`, savedInvoice);
 
   // Create PDF with calculated total amount
   const htmlContent = createInvoiceHTML(data, invoiceNumber);

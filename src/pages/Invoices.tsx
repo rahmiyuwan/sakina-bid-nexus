@@ -119,7 +119,7 @@ const Invoices = () => {
                           </div>
                           <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                             <span>Generated: {new Date(invoice.generated_at).toLocaleDateString()}</span>
-                            <span>Total: ${invoice.total_amount.toFixed(2)}</span>
+                            <span>Total: SAR {invoice.total_amount.toFixed(2)}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
