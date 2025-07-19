@@ -207,6 +207,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         status: req.status as RequestStatus,
         travelUserId: req.travel_workspace_id,
         createdAt: req.created_at,
+        workspace: req.workspace,
       }));
       
       setRequests(formattedRequests);

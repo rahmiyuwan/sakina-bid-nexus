@@ -104,7 +104,7 @@ const Requests: React.FC = () => {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                         <div>
                           <p className="font-medium">Travel Name</p>
-                          <p className="text-muted-foreground">{request.travelName}</p>
+                          <p className="text-muted-foreground">{request.workspace?.description || 'N/A'}</p>
                         </div>
                         <div>
                           <p className="font-medium">Tour Leader</p>
