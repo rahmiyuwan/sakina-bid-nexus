@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, MapPin, Plus, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, Users, MapPin, Plus, Clock, CheckCircle, DollarSign } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { HotelRequest } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +30,27 @@ const TravelDashboard: React.FC = () => {
   const userRequests = requests.filter(req => req.travelUserId === currentProfile?.workspace_id);
   const pendingRequests = userRequests.filter(req => req.status === 'Submitted');
   const confirmedRequests = userRequests.filter(req => req.status === 'Confirmed');
+
+  // Calculate total expense for confirmed bookings
+  const totalExpense = confirmedRequests.reduce((total, request) => {
+    const confirmedOffering = offerings.find(offer => 
+      offer.request_id === request.id && offer.status === 'CONFIRMED'
+    );
+    
+    if (!confirmedOffering) return total;
+    
+    const checkInDate = new Date(request.checkIn);
+    const checkOutDate = new Date(request.checkOut);
+    const totalNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    const expense = 
+      (confirmedOffering.final_price_double * request.roomDb * totalNights) +
+      (confirmedOffering.final_price_triple * request.roomTp * totalNights) +
+      (confirmedOffering.final_price_quad * request.roomQd * totalNights) +
+      (confirmedOffering.final_price_quint * request.roomQt * totalNights);
+    
+    return total + expense;
+  }, 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +118,7 @@ const TravelDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-gradient-card hover:shadow-medium transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
@@ -125,6 +146,19 @@ const TravelDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{confirmedRequests.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-card hover:shadow-medium transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Expense</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-secondary">{totalExpense.toFixed(0)} SAR</div>
+            <p className="text-xs text-muted-foreground">
+              From confirmed bookings
+            </p>
           </CardContent>
         </Card>
       </div>
