@@ -13,8 +13,22 @@ import { ArrowLeft } from 'lucide-react';
 
 const NewRequest: React.FC = () => {
   const navigate = useNavigate();
-  const { currentProfile, addRequest, workspaces } = useApp();
-  const [loading, setLoading] = useState(false);
+  const { currentProfile, addRequest, workspaces, loading } = useApp();
+  const [formLoading, setFormLoading] = useState(false);
+  
+  // Don't render if still loading
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
   
   // Get workspace description for auto-filling travel name
   const userWorkspace = workspaces.find(w => w.id === currentProfile?.workspace_id);
@@ -51,7 +65,7 @@ const NewRequest: React.FC = () => {
       return;
     }
 
-    setLoading(true);
+    setFormLoading(true);
     try {
       const requestData = {
         travelName: formData.travel_name,
@@ -77,7 +91,7 @@ const NewRequest: React.FC = () => {
       console.error('Error creating request:', error);
       toast.error('Failed to create request. Please try again.');
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -274,8 +288,8 @@ const NewRequest: React.FC = () => {
                 <Button type="button" variant="outline" onClick={() => navigate('/requests')}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Creating...' : 'Create Request'}
+                <Button type="submit" disabled={formLoading}>
+                  {formLoading ? 'Creating...' : 'Create Request'}
                 </Button>
               </div>
             </form>
