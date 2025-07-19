@@ -219,7 +219,7 @@ const NewInvoice = () => {
                                 <CollapsibleContent className="mt-2">
                                   <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div>
-                                      <span className="text-muted-foreground">Destination:</span> {request.city}
+                                      <span className="text-muted-foreground">City:</span> {request.city}
                                     </div>
                                     <div>
                                       <span className="text-muted-foreground">Package:</span> {request.packageType}
@@ -238,25 +238,40 @@ const NewInvoice = () => {
                                     </div>
                                   </div>
 
-                                  {acceptedOffering && (
-                                    <div className="mt-3 p-3 bg-muted/50 rounded-lg">
-                                      <div className="font-medium text-sm mb-2">Accepted Offering - {acceptedOffering.hotel_name}</div>
-                                      <div className="grid grid-cols-2 gap-2 text-xs">
-                                        {acceptedOffering.final_price_double > 0 && (
-                                          <div>Double: SAR {acceptedOffering.final_price_double}</div>
-                                        )}
-                                        {acceptedOffering.final_price_triple > 0 && (
-                                          <div>Triple: SAR {acceptedOffering.final_price_triple}</div>
-                                        )}
-                                        {acceptedOffering.final_price_quad > 0 && (
-                                          <div>Quad: SAR {acceptedOffering.final_price_quad}</div>
-                                        )}
-                                        {acceptedOffering.final_price_quint > 0 && (
-                                          <div>Quint: SAR {acceptedOffering.final_price_quint}</div>
-                                        )}
+                                  {acceptedOffering && (() => {
+                                    const checkInDate = new Date(request.checkIn);
+                                    const checkOutDate = new Date(request.checkOut);
+                                    const totalNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+                                    
+                                    return (
+                                      <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                                        <div className="font-medium text-sm mb-2">
+                                          Accepted Offering - {acceptedOffering.hotel_name} ({totalNights} nights)
+                                        </div>
+                                        <div className="text-xs text-muted-foreground mb-2">
+                                          Room Configuration: 
+                                          {request.roomDb > 0 && ` ${request.roomDb} Double`}
+                                          {request.roomTp > 0 && ` ${request.roomTp} Triple`}
+                                          {request.roomQd > 0 && ` ${request.roomQd} Quad`}
+                                          {request.roomQt > 0 && ` ${request.roomQt} Quint`}
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 text-xs">
+                                          {request.roomDb > 0 && acceptedOffering.final_price_double > 0 && (
+                                            <div>Double ({request.roomDb}x): SAR {acceptedOffering.final_price_double}</div>
+                                          )}
+                                          {request.roomTp > 0 && acceptedOffering.final_price_triple > 0 && (
+                                            <div>Triple ({request.roomTp}x): SAR {acceptedOffering.final_price_triple}</div>
+                                          )}
+                                          {request.roomQd > 0 && acceptedOffering.final_price_quad > 0 && (
+                                            <div>Quad ({request.roomQd}x): SAR {acceptedOffering.final_price_quad}</div>
+                                          )}
+                                          {request.roomQt > 0 && acceptedOffering.final_price_quint > 0 && (
+                                            <div>Quint ({request.roomQt}x): SAR {acceptedOffering.final_price_quint}</div>
+                                          )}
+                                        </div>
                                       </div>
-                                    </div>
-                                  )}
+                                    );
+                                  })()}
                                 </CollapsibleContent>
                               </div>
                             </div>
