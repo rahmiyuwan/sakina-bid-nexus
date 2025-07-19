@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Download, Eye } from 'lucide-react';
+import { Plus, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -126,10 +126,6 @@ const Invoices = () => {
                           <Badge className={getStatusColor(invoice.status)}>
                             {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                           </Badge>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Button>
                           <Button variant="outline" size="sm">
                             <Download className="h-4 w-4 mr-1" />
                             Download

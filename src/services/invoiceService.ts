@@ -137,17 +137,24 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
   
   const invoiceNumber = generateInvoiceNumber(workspace);
   
-  // Calculate total amount from offerings
+  // Calculate total amount from confirmed offerings
   let totalAmount = 0;
   requests.forEach(request => {
     const offering = offerings.find(o => o.request_id === request.id && o.status === 'CONFIRMED');
     if (offering) {
-      totalAmount += (offering.final_price_double || 0) + 
-                    (offering.final_price_triple || 0) + 
-                    (offering.final_price_quad || 0) + 
-                    (offering.final_price_quint || 0);
+      // Sum all room type final prices for each confirmed offering
+      const offeringTotal = (offering.final_price_double || 0) + 
+                           (offering.final_price_triple || 0) + 
+                           (offering.final_price_quad || 0) + 
+                           (offering.final_price_quint || 0);
+      totalAmount += offeringTotal;
+      console.log(`Request ${request.id.slice(-6)}: Offering total = $${offeringTotal}`);
+    } else {
+      console.log(`Request ${request.id.slice(-6)}: No confirmed offering found`);
     }
   });
+  
+  console.log(`Invoice total calculation: $${totalAmount} for ${requests.length} requests`);
 
   // Save invoice to database
   const { data: savedInvoice, error: saveError } = await supabase
