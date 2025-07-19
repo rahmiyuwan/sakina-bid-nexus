@@ -449,12 +449,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (!currentUser?.id) return;
     
     try {
+      console.log('Refreshing notifications for user:', currentUser.id);
       const { notificationService } = await import('@/services/notificationService');
       const [notificationsData, unreadCount] = await Promise.all([
         notificationService.getUserNotifications(currentUser.id),
         notificationService.getUnreadCount(currentUser.id)
       ]);
       
+      console.log('Notifications loaded:', notificationsData.length, 'Unread count:', unreadCount);
       setNotifications(notificationsData);
       setUnreadNotificationCount(unreadCount);
     } catch (error) {

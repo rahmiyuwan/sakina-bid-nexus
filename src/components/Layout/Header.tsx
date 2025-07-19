@@ -8,6 +8,8 @@ const Header: React.FC = () => {
   const { currentUser, currentProfile, signOut, unreadNotificationCount } = useApp();
   const navigate = useNavigate();
 
+  console.log('Header: currentUser?.id:', currentUser?.id, 'unreadNotificationCount:', unreadNotificationCount);
+
   const handleLogout = async () => {
     await signOut();
   };
