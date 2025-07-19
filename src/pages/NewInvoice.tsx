@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { MainLayout } from '@/components/Layout/MainLayout';
 import { useApp } from '@/contexts/AppContext';
 import { HotelRequest } from '@/types';
-import { Download, ArrowLeft } from 'lucide-react';
+import { Download, ArrowLeft, ChevronDown, ChevronRight } from 'lucide-react';
 import { generateInvoicePDF } from '@/services/invoiceService';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,6 +19,7 @@ const NewInvoice = () => {
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   const [confirmedRequests, setConfirmedRequests] = useState<HotelRequest[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   // Only allow admin and super_admin access
@@ -61,6 +63,18 @@ const NewInvoice = () => {
     } else {
       setSelectedRequests(prev => prev.filter(id => id !== requestId));
     }
+  };
+
+  const toggleCardExpansion = (requestId: string) => {
+    setExpandedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(requestId)) {
+        newSet.delete(requestId);
+      } else {
+        newSet.add(requestId);
+      }
+      return newSet;
+    });
   };
 
   const generateInvoice = async () => {
@@ -164,78 +178,88 @@ const NewInvoice = () => {
                       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                       .map(request => {
                       const acceptedOffering = offerings.find(o => o.request_id === request.id && o.status === 'CONFIRMED');
+                      const isExpanded = expandedCards.has(request.id);
                       return (
                         <Card key={request.id} className="overflow-hidden">
-                          <div className="flex items-center space-x-3 p-4">
-                            <Checkbox
-                              id={request.id}
-                              checked={selectedRequests.includes(request.id)}
-                              onCheckedChange={(checked) => 
-                                handleRequestSelection(request.id, checked as boolean)
-                              }
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="font-semibold text-lg">
-                                    Request #{request.id.slice(-6).toUpperCase()}
+                          <Collapsible open={isExpanded} onOpenChange={() => toggleCardExpansion(request.id)}>
+                            <div className="flex items-center space-x-3 p-4">
+                              <Checkbox
+                                id={request.id}
+                                checked={selectedRequests.includes(request.id)}
+                                onCheckedChange={(checked) => 
+                                  handleRequestSelection(request.id, checked as boolean)
+                                }
+                              />
+                              <div className="flex-1">
+                                <CollapsibleTrigger asChild>
+                                  <div className="flex items-center justify-between cursor-pointer hover:bg-muted/20 -m-2 p-2 rounded">
+                                    <div className="flex items-center gap-2">
+                                      {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                      <div>
+                                        <div className="font-semibold text-lg">
+                                          Request #{request.id.slice(-6)}
+                                        </div>
+                                        <div className="font-medium text-foreground">
+                                          {request.travelName}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="text-sm text-muted-foreground">
+                                        Status: <span className="text-green-600 font-medium">{request.status}</span>
+                                      </div>
+                                      <div className="text-sm text-muted-foreground">
+                                        Created: {new Date(request.createdAt).toLocaleDateString()}
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="font-medium text-foreground">
-                                    {request.travelName}
+                                </CollapsibleTrigger>
+                                
+                                <CollapsibleContent className="mt-2">
+                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                      <span className="text-muted-foreground">Destination:</span> {request.city}
+                                    </div>
+                                    <div>
+                                      <span className="text-muted-foreground">Package:</span> {request.packageType}
+                                    </div>
+                                    <div>
+                                      <span className="text-muted-foreground">Check-in:</span> {request.checkIn}
+                                    </div>
+                                    <div>
+                                      <span className="text-muted-foreground">Check-out:</span> {request.checkOut}
+                                    </div>
+                                    <div>
+                                      <span className="text-muted-foreground">PAX:</span> {request.paxCount}
+                                    </div>
+                                    <div>
+                                      <span className="text-muted-foreground">Tour Leader:</span> {request.tlName}
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="text-right">
-                                  <div className="text-sm text-muted-foreground">
-                                    Status: <span className="text-green-600 font-medium">{request.status}</span>
-                                  </div>
-                                  <div className="text-sm text-muted-foreground">
-                                    Created: {new Date(request.createdAt).toLocaleDateString()}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                  <span className="text-muted-foreground">Destination:</span> {request.city}
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Package:</span> {request.packageType}
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Check-in:</span> {request.checkIn}
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Check-out:</span> {request.checkOut}
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">PAX:</span> {request.paxCount}
-                                </div>
-                                <div>
-                                  <span className="text-muted-foreground">Tour Leader:</span> {request.tlName}
-                                </div>
-                              </div>
 
-                              {acceptedOffering && (
-                                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
-                                  <div className="font-medium text-sm mb-2">Accepted Offering - {acceptedOffering.hotel_name}</div>
-                                  <div className="grid grid-cols-2 gap-2 text-xs">
-                                    {acceptedOffering.final_price_double > 0 && (
-                                      <div>Double: ${acceptedOffering.final_price_double}</div>
-                                    )}
-                                    {acceptedOffering.final_price_triple > 0 && (
-                                      <div>Triple: ${acceptedOffering.final_price_triple}</div>
-                                    )}
-                                    {acceptedOffering.final_price_quad > 0 && (
-                                      <div>Quad: ${acceptedOffering.final_price_quad}</div>
-                                    )}
-                                    {acceptedOffering.final_price_quint > 0 && (
-                                      <div>Quint: ${acceptedOffering.final_price_quint}</div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
+                                  {acceptedOffering && (
+                                    <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                                      <div className="font-medium text-sm mb-2">Accepted Offering - {acceptedOffering.hotel_name}</div>
+                                      <div className="grid grid-cols-2 gap-2 text-xs">
+                                        {acceptedOffering.final_price_double > 0 && (
+                                          <div>Double: ${acceptedOffering.final_price_double}</div>
+                                        )}
+                                        {acceptedOffering.final_price_triple > 0 && (
+                                          <div>Triple: ${acceptedOffering.final_price_triple}</div>
+                                        )}
+                                        {acceptedOffering.final_price_quad > 0 && (
+                                          <div>Quad: ${acceptedOffering.final_price_quad}</div>
+                                        )}
+                                        {acceptedOffering.final_price_quint > 0 && (
+                                          <div>Quint: ${acceptedOffering.final_price_quint}</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </CollapsibleContent>
+                              </div>
                             </div>
-                          </div>
+                          </Collapsible>
                         </Card>
                       );
                     })}
