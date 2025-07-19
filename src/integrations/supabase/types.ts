@@ -97,6 +97,51 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          action_required: boolean
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          related_entity_id: string | null
+          related_entity_name: string | null
+          related_entity_type: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_required?: boolean
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          related_entity_id?: string | null
+          related_entity_name?: string | null
+          related_entity_type?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_required?: boolean
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          related_entity_id?: string | null
+          related_entity_name?: string | null
+          related_entity_type?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       offerings: {
         Row: {
           admin_margin: number | null
