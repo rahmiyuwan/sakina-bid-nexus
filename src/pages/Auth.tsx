@@ -95,8 +95,15 @@ const Auth: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Welcome</CardTitle>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/lovable-uploads/8cfa4a00-bda0-48f3-9145-21434c9c3a5b.png" 
+              alt="SAKINA Logo" 
+              className="w-16 h-16 object-contain"
+            />
+          </div>
+          <CardTitle>Welcome to SAKINA</CardTitle>
           <CardDescription>
             Sign in to your account or create a new one
           </CardDescription>
