@@ -467,6 +467,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_notification_for_user: {
+        Args: {
+          target_user_id: string
+          notification_title: string
+          notification_message: string
+          notification_type?: string
+          is_read?: boolean
+          action_required?: boolean
+          related_entity_type?: string
+          related_entity_id?: string
+          related_entity_name?: string
+        }
+        Returns: string
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
