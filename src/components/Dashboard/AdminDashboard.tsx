@@ -63,11 +63,15 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleMarginUpdate = (offeringId: string) => {
-    const newMargin = parseFloat(marginEdits[offeringId]);
+  const handleRequestMarginUpdate = (requestId: string) => {
+    const newMargin = parseFloat(marginEdits[requestId]);
     if (!isNaN(newMargin) && newMargin >= 0) {
-      updateOfferingMargin(offeringId, newMargin);
-      setMarginEdits(prev => ({ ...prev, [offeringId]: '' }));
+      // Update margin for all offerings of this request
+      const requestOfferings = offerings.filter(offer => offer.request_id === requestId);
+      requestOfferings.forEach(offering => {
+        updateOfferingMargin(offering.id, newMargin);
+      });
+      setMarginEdits(prev => ({ ...prev, [requestId]: '' }));
     }
   };
 
@@ -196,83 +200,98 @@ const AdminDashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Margin Management */}
+      {/* Request Margin Management */}
       <Card className="border-2 border-secondary/20 shadow-gold">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Settings className="h-5 w-5" />
-            <span>Offering Margin Management</span>
+            <span>Request Margin Management</span>
           </CardTitle>
           <CardDescription>
-            Manage admin margins for each hotel offering. Changes will update final pricing automatically.
+            Manage admin margins for submitted requests. Changes will update all offerings for the request.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {offerings.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No offerings to manage yet</p>
-            ) : (
-              offerings.map((offering) => {
-                const request = getRequestForOffering(offering.request_id);
+            {(() => {
+              const submittedRequests = requests.filter(req => req.status === 'Submitted');
+              if (submittedRequests.length === 0) {
+                return <p className="text-muted-foreground text-center py-8">No submitted requests to manage</p>;
+              }
+              
+              return submittedRequests.map((request) => {
+                const requestOfferings = offerings.filter(offer => offer.request_id === request.id);
+                const currentMargin = requestOfferings.length > 0 ? requestOfferings[0].admin_margin : 10;
+                
                 return (
-                  <div key={offering.id} className="border rounded-lg p-4 space-y-3">
+                  <div key={request.id} className="border rounded-lg p-4 space-y-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-medium">{offering.hotel_name}</h4>
+                        <h4 className="font-medium">{request.travelName}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Request: {request?.travelName} • {request?.city}
+                          {request.city} • {request.paxCount} PAX • Check-in: {request.checkIn}
                         </p>
                         <div className="flex items-center space-x-2 mt-1">
-                          <Badge className={`${getStatusColor(offering.status)}`}>
-                            {offering.status}
+                          <Badge className={`${getStatusColor(request.status)}`}>
+                            {request.status}
                           </Badge>
-                          <Badge className={`${getStatusColor(request?.status || '')}`}>
-                            Request: {request?.status}
+                          <Badge variant="outline">
+                            {requestOfferings.length} Offerings
                           </Badge>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">Current Margin: {offering.admin_margin} SAR</p>
+                        <p className="text-sm font-medium">Current Margin: {currentMargin} SAR</p>
+                        <p className="text-xs text-muted-foreground">Per room per night</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                       <div className="space-y-1">
-                        <p className="font-medium">Double Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.price_double} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.final_price_double} SAR</p>
+                        <p className="font-medium">Double Rooms</p>
+                        <p className="text-muted-foreground">Required: {request.roomDb}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="font-medium">Triple Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.price_triple} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.final_price_triple} SAR</p>
+                        <p className="font-medium">Triple Rooms</p>
+                        <p className="text-muted-foreground">Required: {request.roomTp}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="font-medium">Quad Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.price_quad} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.final_price_quad} SAR</p>
+                        <p className="font-medium">Quad Rooms</p>
+                        <p className="text-muted-foreground">Required: {request.roomQd}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="font-medium">Quint Room</p>
-                        <p className="text-muted-foreground">Provider: {offering.price_quint} SAR</p>
-                        <p className="text-secondary font-medium">Final: {offering.final_price_quint} SAR</p>
+                        <p className="font-medium">Quint Rooms</p>
+                        <p className="text-muted-foreground">Required: {request.roomQt}</p>
                       </div>
                     </div>
 
+                    {requestOfferings.length > 0 && (
+                      <div className="bg-muted/50 rounded-lg p-3">
+                        <p className="text-sm font-medium mb-2">Available Offerings:</p>
+                        <div className="space-y-1">
+                          {requestOfferings.map((offering) => (
+                            <p key={offering.id} className="text-xs text-muted-foreground">
+                              • {offering.hotel_name} - Status: {offering.status}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center space-x-2 pt-2 border-t">
-                      <Label htmlFor={`margin-${offering.id}`} className="text-sm">
-                        Update Margin:
+                      <Label htmlFor={`margin-${request.id}`} className="text-sm">
+                        Update Margin for All Offerings:
                       </Label>
                       <Input
-                        id={`margin-${offering.id}`}
+                        id={`margin-${request.id}`}
                         type="number"
                         step="0.01"
                         min="0"
-                        placeholder={offering.admin_margin.toString()}
-                        value={marginEdits[offering.id] || ''}
+                        placeholder={currentMargin.toString()}
+                        value={marginEdits[request.id] || ''}
                         onChange={(e) => setMarginEdits(prev => ({ 
                           ...prev, 
-                          [offering.id]: e.target.value 
+                          [request.id]: e.target.value 
                         }))}
                         className="w-24"
                       />
@@ -280,16 +299,16 @@ const AdminDashboard: React.FC = () => {
                       <Button 
                         variant="secondary" 
                         size="sm"
-                        onClick={() => handleMarginUpdate(offering.id)}
-                        disabled={!marginEdits[offering.id] || request?.status !== 'Submitted'}
+                        onClick={() => handleRequestMarginUpdate(request.id)}
+                        disabled={!marginEdits[request.id] || requestOfferings.length === 0}
                       >
-                        Update
+                        Update All
                       </Button>
                     </div>
                   </div>
                 );
-              })
-            )}
+              });
+            })()}
           </div>
         </CardContent>
       </Card>
