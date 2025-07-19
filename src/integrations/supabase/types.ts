@@ -279,6 +279,7 @@ export type Database = {
           city: Database["public"]["Enums"]["city_type"]
           created_at: string
           id: string
+          notes: string | null
           package_type: Database["public"]["Enums"]["package_type"]
           pax: number
           request_number: number
@@ -299,6 +300,7 @@ export type Database = {
           city: Database["public"]["Enums"]["city_type"]
           created_at?: string
           id?: string
+          notes?: string | null
           package_type: Database["public"]["Enums"]["package_type"]
           pax: number
           request_number?: number
@@ -319,6 +321,7 @@ export type Database = {
           city?: Database["public"]["Enums"]["city_type"]
           created_at?: string
           id?: string
+          notes?: string | null
           package_type?: Database["public"]["Enums"]["package_type"]
           pax?: number
           request_number?: number

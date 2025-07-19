@@ -157,6 +157,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         travel_workspace_id: currentProfile?.workspace_id || '',
          status: 'Submitted' as const,
         bidding_deadline: new Date(new Date(requestData.checkIn).getTime() - 24 * 60 * 60 * 1000).toISOString(),
+        notes: requestData.notes || null,
       });
 
       // Send notification to admins about new request
@@ -183,6 +184,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         status: dbRequest.status as RequestStatus,
         travelUserId: dbRequest.travel_workspace_id,
         createdAt: dbRequest.created_at,
+        notes: dbRequest.notes,
       };
       setRequests(prev => [...prev, newRequest]);
       return newRequest;
@@ -216,6 +218,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         status: req.status as RequestStatus,
         travelUserId: req.travel_workspace_id,
         createdAt: req.created_at,
+        notes: req.notes,
         workspace: req.workspace,
       }));
       

@@ -57,6 +57,7 @@ export interface Request {
   room_quint: number;
   status: RequestStatus;
   bidding_deadline: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
   workspace?: Workspace;

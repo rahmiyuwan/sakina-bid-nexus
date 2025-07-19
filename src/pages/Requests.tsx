@@ -140,6 +140,14 @@ const Requests: React.FC = () => {
                         </div>
                       </div>
                       
+                      {/* Notes Section */}
+                      {request.notes && (
+                        <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                          <p className="font-medium text-sm mb-1">Notes</p>
+                          <p className="text-sm text-muted-foreground">{request.notes}</p>
+                        </div>
+                      )}
+                      
                       {isAdmin && requestOfferings.length > 0 && (
                         <div className="mt-4 pt-4 border-t">
                           <h4 className="font-medium mb-3">Offers ({requestOfferings.length})</h4>

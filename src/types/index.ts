@@ -40,6 +40,7 @@ export interface HotelRequest {
   status: RequestStatus;
   travelUserId: string;
   createdAt: string;
+  notes?: string; // Add notes field
   workspace?: {
     id: string;
     name: string;

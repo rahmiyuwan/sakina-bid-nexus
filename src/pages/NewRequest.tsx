@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
@@ -15,11 +16,11 @@ const NewRequest: React.FC = () => {
   const { currentProfile, addRequest, workspaces } = useApp();
   const [loading, setLoading] = useState(false);
   
-  // Get workspace name for auto-filling travel name
+  // Get workspace description for auto-filling travel name
   const userWorkspace = workspaces.find(w => w.id === currentProfile?.workspace_id);
   
   const [formData, setFormData] = useState({
-    travel_name: userWorkspace?.name || '',
+    travel_name: userWorkspace?.description || '',
     tour_leader: '',
     pax: '',
     city: '',
@@ -30,17 +31,18 @@ const NewRequest: React.FC = () => {
     room_triple: '0',
     room_quad: '0',
     room_quint: '0',
+    notes: '',
   });
 
   // Update travel_name when workspace data is loaded
   React.useEffect(() => {
-    if (userWorkspace?.name && !formData.travel_name) {
+    if (userWorkspace?.description && !formData.travel_name) {
       setFormData(prev => ({
         ...prev,
-        travel_name: userWorkspace.name
+        travel_name: userWorkspace.description
       }));
     }
-  }, [userWorkspace?.name, formData.travel_name]);
+  }, [userWorkspace?.description, formData.travel_name]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +67,7 @@ const NewRequest: React.FC = () => {
         roomQt: parseInt(formData.room_quint) || 0,
         status: 'Submitted' as const,
         travelUserId: currentProfile.workspace_id,
+        notes: formData.notes,
       };
 
       await addRequest(requestData);
@@ -248,6 +251,21 @@ const NewRequest: React.FC = () => {
                 </div>
                 <div className="text-sm text-muted-foreground">
                   Calculated room capacity: {calculateTotalPax()} PAX
+                </div>
+              </div>
+
+              {/* Notes Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Additional Notes</h3>
+                <div>
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Add any special requirements, preferences, or additional information..."
+                    rows={4}
+                  />
                 </div>
               </div>
 
