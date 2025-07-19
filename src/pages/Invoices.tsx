@@ -26,21 +26,6 @@ const Invoices = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Only allow admin and super_admin access
-  if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
-    return (
-      <MainLayout>
-        <div className="container mx-auto p-6">
-          <Card>
-            <CardContent className="text-center p-8">
-              <p className="text-muted-foreground">Access denied. This page is only available to administrators.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </MainLayout>
-    );
-  }
-
   const fetchInvoices = async () => {
     try {
       setLoading(true);
@@ -64,6 +49,21 @@ const Invoices = () => {
   useEffect(() => {
     fetchInvoices();
   }, []);
+
+  // Only allow admin and super_admin access
+  if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto p-6">
+          <Card>
+            <CardContent className="text-center p-8">
+              <p className="text-muted-foreground">Access denied. This page is only available to administrators.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </MainLayout>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
