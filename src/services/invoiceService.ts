@@ -176,13 +176,13 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
       
       const offeringTotal = dailyTotal * nights;
       totalAmount += offeringTotal;
-      console.log(`Request ${request.id.slice(-6)}: Daily rate = $${dailyTotal}, Nights = ${nights}, Total = $${offeringTotal}`);
+      console.log(`Request ${request.id.slice(-6)}: Hotel=${offering.hotel_name}, Daily=$${dailyTotal}, Nights=${nights}, Total=$${offeringTotal}`);
     } else {
       console.log(`Request ${request.id.slice(-6)}: No confirmed offering found`);
     }
   });
   
-  console.log(`Invoice total calculation: $${totalAmount} for ${requests.length} requests`);
+  console.log(`Final invoice total: $${totalAmount} for ${requests.length} requests`);
 
   // Save invoice to database
   const { data: savedInvoice, error: saveError } = await supabase
@@ -203,6 +203,9 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
     throw new Error('Failed to save invoice record');
   }
 
+  console.log(`Database saved total: $${totalAmount}, Saved invoice:`, savedInvoice);
+
+  // Create PDF with calculated total amount
   const htmlContent = createInvoiceHTML(data, invoiceNumber);
   
   // Create a temporary container
