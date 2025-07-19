@@ -236,7 +236,7 @@ const Auth: React.FC = () => {
                 
                 {role === 'travel_agent' && (
                   <div>
-                    <Label>Travel Agency Name</Label>
+                    <Label>Code</Label>
                     <div className="flex gap-2 mt-2">
                       <Select value={selectedWorkspaceId} onValueChange={setSelectedWorkspaceId}>
                         <SelectTrigger className="flex-1">
@@ -253,7 +253,7 @@ const Auth: React.FC = () => {
                       <Dialog open={showCreateWorkspace} onOpenChange={setShowCreateWorkspace}>
                         <DialogTrigger asChild>
                           <Button type="button" variant="outline" size="sm">
-                            Create New
+                            +
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
