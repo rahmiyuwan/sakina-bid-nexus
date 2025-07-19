@@ -140,6 +140,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     try {
       // Save to database using requestService
       const { requestService } = await import('@/services/requestService');
+      const { notificationService } = await import('@/services/notificationService');
+      
       const dbRequest = await requestService.create({
         travel_name: requestData.travelName,
         tour_leader: requestData.tlName,
@@ -155,6 +157,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         travel_workspace_id: currentProfile?.workspace_id || '',
          status: 'Submitted' as const,
         bidding_deadline: new Date(new Date(requestData.checkIn).getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // Send notification to admins about new request
+      await notificationService.notifyNewRequest(dbRequest.id, {
+        travel_name: requestData.travelName,
+        city: requestData.city,
+        pax: requestData.paxCount
       });
 
       // Convert database format to app format and add to local state
@@ -310,6 +319,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     try {
       const { offeringService } = await import('@/services/offeringService');
       const { requestService } = await import('@/services/requestService');
+      const { notificationService } = await import('@/services/notificationService');
       
       const createOffering = {
         request_id: offeringData.request_id,
@@ -324,6 +334,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       };
       
       const newOffering = await offeringService.create(createOffering);
+
+      // Send notification about new offering
+      await notificationService.notifyNewOffering(newOffering, requests.find(r => r.id === offeringData.request_id));
       
       // Check if this is the first offering for this request
       const existingOfferingsForRequest = offerings.filter(o => o.request_id === offeringData.request_id);
@@ -351,6 +364,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     try {
       const { offeringService } = await import('@/services/offeringService');
       const { requestService } = await import('@/services/requestService');
+      const { notificationService } = await import('@/services/notificationService');
+      
+      // Get all offerings for this request before making changes
+      const requestOfferings = offerings.filter(o => o.request_id === requestId);
       
       // Update selected offering to CONFIRMED
       await offeringService.update(offeringId, { status: 'CONFIRMED' });
@@ -365,6 +382,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       // Update request status to "Confirmed" in database
       await requestService.update(requestId, { status: 'Confirmed' });
+
+      // Send notifications about request confirmation
+      await notificationService.notifyRequestConfirmation(requestId, offeringId, requestOfferings);
 
       // Update local state
       setOfferings(prev => prev.map(offering => 
