@@ -16,6 +16,11 @@ const NewInvoice = () => {
   const navigate = useNavigate();
   const { currentProfile, requests, workspaces, offerings, refreshRequests } = useApp();
   const { toast } = useToast();
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>('');
+  const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
+  const [confirmedRequests, setConfirmedRequests] = useState<HotelRequest[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   // Only allow admin and super_admin access
   if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
@@ -31,12 +36,6 @@ const NewInvoice = () => {
       </MainLayout>
     );
   }
-
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string>('');
-  const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
-  const [confirmedRequests, setConfirmedRequests] = useState<HotelRequest[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     refreshRequests();
