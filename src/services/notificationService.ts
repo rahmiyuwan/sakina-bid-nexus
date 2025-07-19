@@ -47,7 +47,7 @@ class NotificationService {
   }
 
   async createNotification(notification: Omit<Notification, 'id' | 'created_at' | 'updated_at'>) {
-    const { data, error } = await supabase.rpc('create_notification_for_user', {
+    const { data: notificationId, error } = await supabase.rpc('create_notification_for_user', {
       target_user_id: notification.user_id,
       notification_title: notification.title,
       notification_message: notification.message,
@@ -61,15 +61,21 @@ class NotificationService {
 
     if (error) throw error;
     
-    // Get the created notification by ID
-    const { data: createdNotification, error: fetchError } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('id', data)
-      .single();
-    
-    if (fetchError) throw fetchError;
-    return createdNotification as Notification;
+    // Return a simplified notification object since we don't need to fetch it back
+    return {
+      id: notificationId,
+      user_id: notification.user_id,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      is_read: notification.is_read,
+      action_required: notification.action_required,
+      related_entity_type: notification.related_entity_type,
+      related_entity_id: notification.related_entity_id,
+      related_entity_name: notification.related_entity_name,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    } as Notification;
   }
 
   // Helper function to get all admin and super admin users
