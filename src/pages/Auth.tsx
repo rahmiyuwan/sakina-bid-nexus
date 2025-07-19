@@ -14,6 +14,7 @@ const Auth: React.FC = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
+  const [role, setRole] = useState('travel_agent');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -73,6 +74,7 @@ const Auth: React.FC = () => {
           data: {
             full_name: fullName,
             username: username,
+            role: role,
           }
         }
       });
@@ -191,6 +193,35 @@ const Auth: React.FC = () => {
                     required
                     minLength={6}
                   />
+                </div>
+                <div>
+                  <Label>Account Type</Label>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="travel-agent"
+                        name="role"
+                        value="travel_agent"
+                        checked={role === 'travel_agent'}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="travel-agent" className="cursor-pointer">Travel Agent</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="hotel-provider"
+                        name="role"
+                        value="hotel_provider"
+                        checked={role === 'hotel_provider'}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="hotel-provider" className="cursor-pointer">Hotel Provider</Label>
+                    </div>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Creating Account...' : 'Create Account'}
