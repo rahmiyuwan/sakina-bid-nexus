@@ -18,12 +18,29 @@ const AdminDashboard: React.FC = () => {
   const confirmedOfferings = offerings.filter(offer => offer.status === 'CONFIRMED');
   
   const totalRevenue = confirmedOfferings.reduce((total, offer) => {
-    const adminRevenue = offer.admin_margin * 4; // Assuming 4 room types for simplicity
+    const request = requests.find(req => req.id === offer.request_id);
+    if (!request) return total;
+    
+    const adminRevenue = 
+      (offer.admin_margin * request.roomDb) +
+      (offer.admin_margin * request.roomTp) +
+      (offer.admin_margin * request.roomQd) +
+      (offer.admin_margin * request.roomQt);
+    
     return total + adminRevenue;
   }, 0);
 
   const totalTransactionValue = confirmedOfferings.reduce((total, offer) => {
-    return total + offer.final_price_double + offer.final_price_triple + offer.final_price_quad + offer.final_price_quint;
+    const request = requests.find(req => req.id === offer.request_id);
+    if (!request) return total;
+    
+    const transactionValue = 
+      (offer.final_price_double * request.roomDb) +
+      (offer.final_price_triple * request.roomTp) +
+      (offer.final_price_quad * request.roomQd) +
+      (offer.final_price_quint * request.roomQt);
+    
+    return total + transactionValue;
   }, 0);
 
   const getStatusColor = (status: string) => {
