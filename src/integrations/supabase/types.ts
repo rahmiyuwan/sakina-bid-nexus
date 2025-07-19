@@ -97,6 +97,60 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          admin_id: string
+          created_at: string
+          generated_at: string
+          id: string
+          invoice_number: string
+          request_ids: string[]
+          status: string
+          total_amount: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          invoice_number: string
+          request_ids: string[]
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          invoice_number?: string
+          request_ids?: string[]
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_invoices_admin"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_invoices_workspace"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           action_required: boolean

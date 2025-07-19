@@ -1,12 +1,14 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { UserProfile, HotelRequest } from '@/types';
+import { UserProfile, HotelRequest, HotelOffering } from '@/types';
 import type { Workspace } from '@/types/database';
+import { supabase } from '@/integrations/supabase/client';
 
 interface InvoiceData {
   requests: HotelRequest[];
   workspace: Workspace;
   adminProfile: UserProfile;
+  offerings?: HotelOffering[];
 }
 
 const generateInvoiceNumber = (workspace: Workspace): string => {
@@ -130,8 +132,42 @@ const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => 
   `;
 };
 
-export const generateInvoicePDF = async (data: InvoiceData): Promise<void> => {
-  const invoiceNumber = generateInvoiceNumber(data.workspace);
+export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
+  const { requests, workspace, adminProfile, offerings = [] } = data;
+  
+  const invoiceNumber = generateInvoiceNumber(workspace);
+  
+  // Calculate total amount from offerings
+  let totalAmount = 0;
+  requests.forEach(request => {
+    const offering = offerings.find(o => o.request_id === request.id && o.status === 'CONFIRMED');
+    if (offering) {
+      totalAmount += (offering.final_price_double || 0) + 
+                    (offering.final_price_triple || 0) + 
+                    (offering.final_price_quad || 0) + 
+                    (offering.final_price_quint || 0);
+    }
+  });
+
+  // Save invoice to database
+  const { data: savedInvoice, error: saveError } = await supabase
+    .from('invoices')
+    .insert({
+      invoice_number: invoiceNumber,
+      workspace_id: workspace.id,
+      admin_id: adminProfile.id,
+      request_ids: requests.map(r => r.id),
+      total_amount: totalAmount,
+      status: 'generated'
+    })
+    .select()
+    .single();
+
+  if (saveError) {
+    console.error('Error saving invoice:', saveError);
+    throw new Error('Failed to save invoice record');
+  }
+
   const htmlContent = createInvoiceHTML(data, invoiceNumber);
   
   // Create a temporary container
@@ -174,6 +210,8 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<void> => {
     
     // Download the PDF
     pdf.save(`${invoiceNumber}.pdf`);
+    
+    return savedInvoice;
   } finally {
     // Clean up
     document.body.removeChild(container);

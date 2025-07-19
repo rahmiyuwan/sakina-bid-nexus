@@ -100,10 +100,11 @@ const NewInvoice = () => {
         throw new Error('Selected workspace not found');
       }
 
-      await generateInvoicePDF({
+      const savedInvoice = await generateInvoicePDF({
         requests: selectedRequestsData,
         workspace: selectedWorkspaceData,
-        adminProfile: currentProfile
+        adminProfile: currentProfile,
+        offerings
       });
 
       toast({
