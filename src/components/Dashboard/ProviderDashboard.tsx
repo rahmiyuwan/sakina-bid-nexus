@@ -31,6 +31,7 @@ const ProviderDashboard: React.FC = () => {
   );
   const pendingOfferings = userOfferings.filter(offer => offer.status === 'PENDING');
   const confirmedOfferings = userOfferings.filter(offer => offer.status === 'CONFIRMED');
+  const rejectedOfferings = userOfferings.filter(offer => offer.status === 'CANCELED');
 
   const handleSubmitOffer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,7 +117,7 @@ const ProviderDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <Card className="bg-gradient-card hover:shadow-medium transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Available Requests</CardTitle>
@@ -144,6 +145,16 @@ const ProviderDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{confirmedOfferings.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-card hover:shadow-medium transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Rejected Deals</CardTitle>
+            <X className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{rejectedOfferings.length}</div>
           </CardContent>
         </Card>
 
