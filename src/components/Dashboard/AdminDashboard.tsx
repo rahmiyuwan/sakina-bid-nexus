@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,10 +6,26 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, Building2, DollarSign, Settings, TrendingUp } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { settingService } from '@/services/settingService';
 
 const AdminDashboard: React.FC = () => {
   const { requests, offerings, updateOfferingMargin } = useApp();
   const [marginEdits, setMarginEdits] = useState<{[key: string]: string}>({});
+  const [defaultMargin, setDefaultMargin] = useState<number>(10);
+
+  useEffect(() => {
+    const loadDefaultMargin = async () => {
+      try {
+        const setting = await settingService.getByKey('default_margin');
+        if (setting && setting.value) {
+          setDefaultMargin(parseFloat(setting.value));
+        }
+      } catch (error) {
+        console.error('Error loading default margin:', error);
+      }
+    };
+    loadDefaultMargin();
+  }, []);
 
   const totalRequests = requests.length;
   const pendingRequests = requests.filter(req => req.status === 'Submitted').length;
@@ -221,7 +237,8 @@ const AdminDashboard: React.FC = () => {
               
               return submittedRequests.map((request) => {
                 const requestOfferings = offerings.filter(offer => offer.request_id === request.id);
-                const currentMargin = requestOfferings.length > 0 ? requestOfferings[0].admin_margin : 10;
+                const currentMargin = requestOfferings.length > 0 ? requestOfferings[0].admin_margin : defaultMargin;
+                const hasOfferings = requestOfferings.length > 0;
                 
                 return (
                   <div key={request.id} className="border rounded-lg p-4 space-y-3">
@@ -280,7 +297,7 @@ const AdminDashboard: React.FC = () => {
 
                     <div className="flex items-center space-x-2 pt-2 border-t">
                       <Label htmlFor={`margin-${request.id}`} className="text-sm">
-                        Update Margin for All Offerings:
+                        Change Margin:
                       </Label>
                       <Input
                         id={`margin-${request.id}`}
@@ -294,17 +311,24 @@ const AdminDashboard: React.FC = () => {
                           [request.id]: e.target.value 
                         }))}
                         className="w-24"
+                        disabled={hasOfferings}
                       />
                       <span className="text-sm text-muted-foreground">SAR</span>
                       <Button 
                         variant="secondary" 
                         size="sm"
                         onClick={() => handleRequestMarginUpdate(request.id)}
-                        disabled={!marginEdits[request.id] || requestOfferings.length === 0}
+                        disabled={!marginEdits[request.id] || hasOfferings}
+                        title={hasOfferings ? "Cannot change margin when offers exist" : ""}
                       >
-                        Update All
+                        Change Margin
                       </Button>
                     </div>
+                    {hasOfferings && (
+                      <p className="text-xs text-amber-600 mt-1">
+                        ⚠️ Cannot change margin - offers already exist for this request
+                      </p>
+                    )}
                   </div>
                 );
               });

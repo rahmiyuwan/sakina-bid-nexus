@@ -104,19 +104,24 @@ const CommissionManagement: React.FC = () => {
       confirmedOfferings.forEach(offering => {
         const margin = offering.admin_margin || 0;
         
-        // Calculate offer (total of required rooms * price)
-        const offerTotal = 
-          (request.roomDb * (offering.price_double || 0)) +
-          (request.roomTp * (offering.price_triple || 0)) +
-          (request.roomQd * (offering.price_quad || 0)) +
-          (request.roomQt * (offering.price_quint || 0));
+        // Calculate nights
+        const checkInDate = new Date(request.checkIn);
+        const checkOutDate = new Date(request.checkOut);
+        const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
         
-        // Calculate final (total of required rooms * (price + margin))
+        // Calculate offer (total of required rooms * price * nights)
+        const offerTotal = 
+          (request.roomDb * (offering.price_double || 0) * nights) +
+          (request.roomTp * (offering.price_triple || 0) * nights) +
+          (request.roomQd * (offering.price_quad || 0) * nights) +
+          (request.roomQt * (offering.price_quint || 0) * nights);
+        
+        // Calculate final (total of required rooms * (price + margin) * nights)
         const finalTotal = 
-          (request.roomDb * ((offering.price_double || 0) + margin)) +
-          (request.roomTp * ((offering.price_triple || 0) + margin)) +
-          (request.roomQd * ((offering.price_quad || 0) + margin)) +
-          (request.roomQt * ((offering.price_quint || 0) + margin));
+          (request.roomDb * ((offering.price_double || 0) + margin) * nights) +
+          (request.roomTp * ((offering.price_triple || 0) + margin) * nights) +
+          (request.roomQd * ((offering.price_quad || 0) + margin) * nights) +
+          (request.roomQt * ((offering.price_quint || 0) + margin) * nights);
         
         // Commission is final - offer
         const totalCommission = finalTotal - offerTotal;
@@ -128,6 +133,7 @@ const CommissionManagement: React.FC = () => {
           requestNumber,
           workspace: workspace?.name || 'Unknown',
           pax: request.paxCount,
+          nights,
           offer: offerTotal,
           final: finalTotal,
           totalCommission,
@@ -198,6 +204,7 @@ const CommissionManagement: React.FC = () => {
                 <TableHead>Request Number</TableHead>
                 <TableHead>Workspace</TableHead>
                 <TableHead>Pax</TableHead>
+                <TableHead>Nights</TableHead>
                 <TableHead>Hotel</TableHead>
                 <TableHead>Offer (SAR)</TableHead>
                 <TableHead>Final (SAR)</TableHead>
@@ -211,6 +218,7 @@ const CommissionManagement: React.FC = () => {
                   <TableCell>#{item.requestNumber}</TableCell>
                   <TableCell>{item.workspace}</TableCell>
                   <TableCell>{item.pax}</TableCell>
+                  <TableCell>{item.nights}</TableCell>
                   <TableCell>{item.hotelName}</TableCell>
                   <TableCell>{item.offer.toFixed(2)}</TableCell>
                   <TableCell>{item.final.toFixed(2)}</TableCell>
