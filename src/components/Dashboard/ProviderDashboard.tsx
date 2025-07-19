@@ -81,11 +81,15 @@ const ProviderDashboard: React.FC = () => {
     const request = requests.find(req => req.id === offer.request_id);
     if (!request) return total;
     
+    const checkInDate = new Date(request.checkIn);
+    const checkOutDate = new Date(request.checkOut);
+    const totalNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    
     const revenue = 
-      (offer.price_double * request.roomDb) +
-      (offer.price_triple * request.roomTp) +
-      (offer.price_quad * request.roomQd) +
-      (offer.price_quint * request.roomQt);
+      (offer.price_double * request.roomDb * totalNights) +
+      (offer.price_triple * request.roomTp * totalNights) +
+      (offer.price_quad * request.roomQd * totalNights) +
+      (offer.price_quint * request.roomQt * totalNights);
     
     return total + revenue;
   }, 0);

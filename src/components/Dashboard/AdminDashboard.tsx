@@ -21,11 +21,15 @@ const AdminDashboard: React.FC = () => {
     const request = requests.find(req => req.id === offer.request_id);
     if (!request) return total;
     
+    const checkInDate = new Date(request.checkIn);
+    const checkOutDate = new Date(request.checkOut);
+    const totalNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    
     const adminRevenue = 
-      (offer.admin_margin * request.roomDb) +
-      (offer.admin_margin * request.roomTp) +
-      (offer.admin_margin * request.roomQd) +
-      (offer.admin_margin * request.roomQt);
+      (offer.admin_margin * request.roomDb * totalNights) +
+      (offer.admin_margin * request.roomTp * totalNights) +
+      (offer.admin_margin * request.roomQd * totalNights) +
+      (offer.admin_margin * request.roomQt * totalNights);
     
     return total + adminRevenue;
   }, 0);
@@ -34,11 +38,15 @@ const AdminDashboard: React.FC = () => {
     const request = requests.find(req => req.id === offer.request_id);
     if (!request) return total;
     
+    const checkInDate = new Date(request.checkIn);
+    const checkOutDate = new Date(request.checkOut);
+    const totalNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    
     const transactionValue = 
-      (offer.final_price_double * request.roomDb) +
-      (offer.final_price_triple * request.roomTp) +
-      (offer.final_price_quad * request.roomQd) +
-      (offer.final_price_quint * request.roomQt);
+      (offer.final_price_double * request.roomDb * totalNights) +
+      (offer.final_price_triple * request.roomTp * totalNights) +
+      (offer.final_price_quad * request.roomQd * totalNights) +
+      (offer.final_price_quint * request.roomQt * totalNights);
     
     return total + transactionValue;
   }, 0);
