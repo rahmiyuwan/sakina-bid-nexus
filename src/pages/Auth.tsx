@@ -6,8 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { workspaceService } from '@/services/workspaceService';
+import type { Workspace } from '@/types/database';
 
 const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +19,10 @@ const Auth: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('travel_agent');
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('');
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [newWorkspaceName, setNewWorkspaceName] = useState('');
+  const [showCreateWorkspace, setShowCreateWorkspace] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -30,6 +38,48 @@ const Auth: React.FC = () => {
     };
     checkUser();
   }, [navigate]);
+
+  useEffect(() => {
+    // Load workspaces when component mounts
+    const loadWorkspaces = async () => {
+      try {
+        const data = await workspaceService.getAll();
+        setWorkspaces(data);
+      } catch (error) {
+        console.error('Error loading workspaces:', error);
+      }
+    };
+    loadWorkspaces();
+  }, []);
+
+  const handleCreateWorkspace = async () => {
+    if (!newWorkspaceName.trim()) return;
+    
+    try {
+      const newWorkspace = await workspaceService.create({
+        name: newWorkspaceName,
+        description: `Travel Agency: ${newWorkspaceName}`,
+        is_active: true
+      });
+      
+      setWorkspaces(prev => [newWorkspace, ...prev]);
+      setSelectedWorkspaceId(newWorkspace.id);
+      setNewWorkspaceName('');
+      setShowCreateWorkspace(false);
+      
+      toast({
+        title: "Success",
+        description: "Workspace created successfully!",
+      });
+    } catch (error) {
+      console.error('Error creating workspace:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create workspace. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +125,7 @@ const Auth: React.FC = () => {
             full_name: fullName,
             username: username,
             role: role,
+            workspace_id: role === 'travel_agent' ? selectedWorkspaceId : null,
           }
         }
       });
@@ -154,6 +205,95 @@ const Auth: React.FC = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div>
+                  <Label>Account Type</Label>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="travel-agent"
+                        name="role"
+                        value="travel_agent"
+                        checked={role === 'travel_agent'}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="travel-agent" className="cursor-pointer">Travel Agent</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="hotel-provider"
+                        name="role"
+                        value="hotel_provider"
+                        checked={role === 'hotel_provider'}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="hotel-provider" className="cursor-pointer">Hotel Provider</Label>
+                    </div>
+                  </div>
+                </div>
+                
+                {role === 'travel_agent' && (
+                  <div>
+                    <Label>Travel Agency Name</Label>
+                    <div className="flex gap-2 mt-2">
+                      <Select value={selectedWorkspaceId} onValueChange={setSelectedWorkspaceId}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Select your travel agency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {workspaces.map((workspace) => (
+                            <SelectItem key={workspace.id} value={workspace.id}>
+                              {workspace.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Dialog open={showCreateWorkspace} onOpenChange={setShowCreateWorkspace}>
+                        <DialogTrigger asChild>
+                          <Button type="button" variant="outline" size="sm">
+                            Create New
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Create New Travel Agency</DialogTitle>
+                            <DialogDescription>
+                              Enter the name of your travel agency to create a new workspace.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="workspace-name">Agency Name</Label>
+                              <Input
+                                id="workspace-name"
+                                value={newWorkspaceName}
+                                onChange={(e) => setNewWorkspaceName(e.target.value)}
+                                placeholder="Enter agency name"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <Button onClick={handleCreateWorkspace} className="flex-1">
+                                Create
+                              </Button>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setShowCreateWorkspace(false)}
+                                className="flex-1"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                )}
+                
+                <div>
                   <Label htmlFor="signup-fullname">Full Name</Label>
                   <Input
                     id="signup-fullname"
@@ -193,35 +333,6 @@ const Auth: React.FC = () => {
                     required
                     minLength={6}
                   />
-                </div>
-                <div>
-                  <Label>Account Type</Label>
-                  <div className="grid grid-cols-2 gap-4 mt-2">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="travel-agent"
-                        name="role"
-                        value="travel_agent"
-                        checked={role === 'travel_agent'}
-                        onChange={(e) => setRole(e.target.value)}
-                        className="text-primary focus:ring-primary"
-                      />
-                      <Label htmlFor="travel-agent" className="cursor-pointer">Travel Agent</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="hotel-provider"
-                        name="role"
-                        value="hotel_provider"
-                        checked={role === 'hotel_provider'}
-                        onChange={(e) => setRole(e.target.value)}
-                        className="text-primary focus:ring-primary"
-                      />
-                      <Label htmlFor="hotel-provider" className="cursor-pointer">Hotel Provider</Label>
-                    </div>
-                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Creating Account...' : 'Create Account'}
