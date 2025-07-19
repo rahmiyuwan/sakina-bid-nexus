@@ -80,7 +80,15 @@ const Requests: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              requests.map((request) => {
+              requests
+                .filter(request => {
+                  // Hotel providers should only see non-confirmed requests
+                  if (currentProfile?.role === 'hotel_provider') {
+                    return request.status !== 'Confirmed';
+                  }
+                  return true;
+                })
+                .map((request) => {
                 const requestOfferings = offerings.filter(offering => offering.request_id === request.id);
                 const isAdmin = currentProfile?.role === 'admin' || currentProfile?.role === 'super_admin';
                 
