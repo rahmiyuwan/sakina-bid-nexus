@@ -14,7 +14,8 @@ import {
   MapPin,
   ClipboardList,
   UserCheck,
-  Hotel
+  Hotel,
+  Receipt
 } from 'lucide-react';
 import {
   Sidebar,
@@ -55,6 +56,7 @@ const getNavigationItems = (role: string) => {
       return [
         { title: 'Dashboard', url: '/dashboard', icon: Home },
         { title: 'All Requests', url: '/requests', icon: FileText },
+        { title: 'Invoices', url: '/invoices', icon: Receipt },
         { title: 'Commissions', url: '/commissions', icon: DollarSign },
         { title: 'Hotels', url: '/hotels', icon: Hotel },
         { title: 'Notifications', url: '/notifications', icon: Bell },
@@ -65,6 +67,7 @@ const getNavigationItems = (role: string) => {
       return [
         { title: 'Dashboard', url: '/dashboard', icon: Home },
         { title: 'All Requests', url: '/requests', icon: FileText },
+        { title: 'Invoices', url: '/invoices', icon: Receipt },
         { title: 'Commissions', url: '/commissions', icon: DollarSign },
         { title: 'Hotels', url: '/hotels', icon: Hotel },
         { title: 'Settings', url: '/settings', icon: Settings },

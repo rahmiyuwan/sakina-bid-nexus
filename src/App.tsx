@@ -20,6 +20,8 @@ import Workspaces from "./pages/Workspaces";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import MyBids from "./pages/MyBids";
+import Invoices from "./pages/Invoices";
+import NewInvoice from "./pages/NewInvoice";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/workspaces" element={<Workspaces />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/invoices/new" element={<NewInvoice />} />
             <Route path="/admin" element={<AdminPanel />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
