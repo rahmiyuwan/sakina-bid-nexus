@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, Bell } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 const Header: React.FC = () => {
-  const { currentUser, currentProfile, signOut } = useApp();
+  const { currentUser, currentProfile, signOut, unreadNotificationCount } = useApp();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await signOut();
@@ -42,9 +44,18 @@ const Header: React.FC = () => {
 
           {currentUser && (
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="relative"
+                onClick={() => navigate('/notifications')}
+              >
                 <Bell className="h-5 w-5" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full"></div>
+                {unreadNotificationCount > 0 && (
+                  <div className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs font-medium">
+                    {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
+                  </div>
+                )}
               </Button>
               
               <div className="text-right">

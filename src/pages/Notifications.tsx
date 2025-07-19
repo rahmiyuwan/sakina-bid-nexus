@@ -12,57 +12,24 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
 const Notifications: React.FC = () => {
-  const { currentUser } = useApp();
+  const { currentUser, notifications, refreshNotifications } = useApp();
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (currentUser?.id) {
-      loadNotifications();
-      
-      // Subscribe to real-time notifications
-      const unsubscribe = notificationService.subscribeToNotifications(
-        currentUser.id,
-        (newNotification) => {
-          setNotifications(prev => [newNotification, ...prev]);
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-          });
-        }
-      );
-
-      return unsubscribe;
+      setLoading(false); // AppContext handles loading
     }
-  }, [currentUser?.id, toast]);
+  }, [currentUser?.id]);
 
-  const loadNotifications = async () => {
-    if (!currentUser?.id) return;
-    
-    try {
-      setLoading(true);
-      const data = await notificationService.getUserNotifications(currentUser.id);
-      setNotifications(data);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to load notifications',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleMarkAsRead = async (id: string) => {
     try {
       await notificationService.markAsRead(id);
-      setNotifications(prev =>
-        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-      );
+      // Refresh notifications from AppContext
+      await refreshNotifications();
     } catch (error) {
       toast({
         title: 'Error',
@@ -77,9 +44,8 @@ const Notifications: React.FC = () => {
     
     try {
       await notificationService.markAllAsRead(currentUser.id);
-      setNotifications(prev =>
-        prev.map(n => ({ ...n, is_read: true }))
-      );
+      // Refresh notifications from AppContext
+      await refreshNotifications();
       toast({
         title: 'Success',
         description: 'All notifications marked as read',
@@ -96,7 +62,8 @@ const Notifications: React.FC = () => {
   const handleDeleteNotification = async (id: string) => {
     try {
       await notificationService.deleteNotification(id);
-      setNotifications(prev => prev.filter(n => n.id !== id));
+      // Refresh notifications from AppContext
+      await refreshNotifications();
       toast({
         title: 'Success',
         description: 'Notification deleted',

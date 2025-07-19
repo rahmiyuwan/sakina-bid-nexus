@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { HotelRequest, HotelOffering, UserRole, OfferingStatus, RequestStatus, UserProfile } from '@/types';
 import type { Hotel, Setting, Workspace } from '@/types/database';
+import type { Notification } from '@/services/notificationService';
 
 interface AppContextType {
   // Auth state
@@ -22,6 +23,8 @@ interface AppContextType {
   workspaces: Workspace[];
   users: UserProfile[];
   commissions: any[];
+  notifications: Notification[];
+  unreadNotificationCount: number;
   
   // Loading states
   dataLoading: boolean;
@@ -34,6 +37,7 @@ interface AppContextType {
   refreshWorkspaces: () => Promise<void>;
   refreshUsers: () => Promise<void>;
   refreshCommissions: () => Promise<void>;
+  refreshNotifications: () => Promise<void>;
   
   // Actions
   addRequest: (request: Omit<HotelRequest, 'id' | 'createdAt'>) => Promise<HotelRequest>;
@@ -69,6 +73,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [commissions, setCommissions] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
   // Auth effect
   useEffect(() => {
@@ -305,8 +311,37 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       refreshWorkspaces();
       refreshUsers();
       refreshCommissions();
+      refreshNotifications();
     }
   }, [currentProfile, loading]);
+
+  // Set up real-time notifications
+  useEffect(() => {
+    if (currentUser?.id) {
+      const setupNotifications = async () => {
+        const { notificationService } = await import('@/services/notificationService');
+        
+        const unsubscribe = notificationService.subscribeToNotifications(
+          currentUser.id,
+          (newNotification) => {
+            setNotifications(prev => [newNotification, ...prev]);
+            setUnreadNotificationCount(prev => prev + 1);
+          }
+        );
+
+        return unsubscribe;
+      };
+
+      let cleanup: (() => void) | undefined;
+      setupNotifications().then(unsubscribe => {
+        cleanup = unsubscribe;
+      });
+
+      return () => {
+        if (cleanup) cleanup();
+      };
+    }
+  }, [currentUser?.id]);
 
   const refreshOfferings = async () => {
     try {
@@ -410,6 +445,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
+  const refreshNotifications = async () => {
+    if (!currentUser?.id) return;
+    
+    try {
+      const { notificationService } = await import('@/services/notificationService');
+      const [notificationsData, unreadCount] = await Promise.all([
+        notificationService.getUserNotifications(currentUser.id),
+        notificationService.getUnreadCount(currentUser.id)
+      ]);
+      
+      setNotifications(notificationsData);
+      setUnreadNotificationCount(unreadCount);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
   const updateOfferingMargin = (offeringId: string, margin: number) => {
     setOfferings(prev => prev.map(offering => 
       offering.id === offeringId 
@@ -438,6 +490,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     workspaces,
     users,
     commissions,
+    notifications,
+    unreadNotificationCount,
     dataLoading,
     refreshRequests,
     refreshOfferings,
@@ -446,6 +500,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     refreshWorkspaces,
     refreshUsers,
     refreshCommissions,
+    refreshNotifications,
     addRequest,
     addOffering,
     confirmOffering,
