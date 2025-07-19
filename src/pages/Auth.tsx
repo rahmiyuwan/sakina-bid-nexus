@@ -123,10 +123,6 @@ const Auth: React.FC = () => {
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          data: {
-            role: role,
-            workspace_id: role === 'travel_agent' ? selectedWorkspaceId : null,
-          }
         }
       });
 
