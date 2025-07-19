@@ -28,18 +28,37 @@ const generateInvoiceNumber = (workspace: Workspace): string => {
 };
 
 const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => {
-  const { requests, workspace, adminProfile } = data;
+  const { requests, workspace, adminProfile, offerings = [] } = data;
   
-  // Calculate totals - for now using a base amount per request
-  // In production, this should use actual accepted offering amounts
+  // Calculate totals with actual offering amounts and nights
   let grandTotal = 0;
   const invoiceItems = requests.map(request => {
-    const total = 1000; // Placeholder amount
+    const offering = offerings.find(o => o.request_id === request.id && o.status === 'CONFIRMED');
+    
+    // Calculate number of nights
+    const checkInDate = new Date(request.checkIn);
+    const checkOutDate = new Date(request.checkOut);
+    const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    let total = 0;
+    let hotelName = 'No confirmed offering';
+    
+    if (offering) {
+      const dailyTotal = (offering.final_price_double || 0) + 
+                        (offering.final_price_triple || 0) + 
+                        (offering.final_price_quad || 0) + 
+                        (offering.final_price_quint || 0);
+      total = dailyTotal * nights;
+      hotelName = offering.hotel_name;
+    }
+    
     grandTotal += total;
     
     return {
       ...request,
-      total
+      total,
+      nights,
+      hotelName
     };
   });
 
@@ -83,14 +102,14 @@ const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => 
       <!-- Invoice Items -->
       <div style="margin-bottom: 30px;">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-          <thead>
-            <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-              <th style="padding: 12px; text-align: left; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Request</th>
-              <th style="padding: 12px; text-align: left; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Details</th>
-              <th style="padding: 12px; text-align: left; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Hotel</th>
-              <th style="padding: 12px; text-align: right; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Amount</th>
-            </tr>
-          </thead>
+           <thead>
+             <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+               <th style="padding: 12px; text-align: left; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Request</th>
+               <th style="padding: 12px; text-align: left; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Details</th>
+               <th style="padding: 12px; text-align: left; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Hotel & Nights</th>
+               <th style="padding: 12px; text-align: right; color: #1e293b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Amount</th>
+             </tr>
+           </thead>
           <tbody>
             ${invoiceItems.map(item => `
               <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -98,17 +117,19 @@ const createInvoiceHTML = (data: InvoiceData, invoiceNumber: string): string => 
                   <div style="font-weight: bold;">REQ-${item.id.slice(-6)}</div>
                   <div style="font-size: 12px; color: #64748b;">${item.travelName}</div>
                 </td>
-                <td style="padding: 12px; color: #64748b; font-size: 14px;">
-                  <div>${item.city}</div>
-                  <div>${item.checkIn} to ${item.checkOut}</div>
-                  <div>${item.paxCount} PAX</div>
-                </td>
-                <td style="padding: 12px; color: #64748b; font-size: 14px;">
-                  Tour Leader: ${item.tlName}
-                </td>
-                <td style="padding: 12px; text-align: right; color: #1e293b; font-weight: bold; font-size: 16px;">
-                  $${item.total.toFixed(2)}
-                </td>
+                 <td style="padding: 12px; color: #64748b; font-size: 14px;">
+                   <div>${item.city}</div>
+                   <div>${item.checkIn} to ${item.checkOut}</div>
+                   <div>${item.paxCount} PAX</div>
+                 </td>
+                 <td style="padding: 12px; color: #64748b; font-size: 14px;">
+                   <div style="font-weight: bold; color: #1e293b;">${item.hotelName}</div>
+                   <div>${item.nights} night${item.nights !== 1 ? 's' : ''}</div>
+                   <div>Tour Leader: ${item.tlName}</div>
+                 </td>
+                 <td style="padding: 12px; text-align: right; color: #1e293b; font-weight: bold; font-size: 16px;">
+                   $${item.total.toFixed(2)}
+                 </td>
               </tr>
             `).join('')}
           </tbody>
@@ -137,18 +158,25 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<any> => {
   
   const invoiceNumber = generateInvoiceNumber(workspace);
   
-  // Calculate total amount from confirmed offerings
+  // Calculate total amount from confirmed offerings including nights
   let totalAmount = 0;
   requests.forEach(request => {
     const offering = offerings.find(o => o.request_id === request.id && o.status === 'CONFIRMED');
     if (offering) {
+      // Calculate number of nights
+      const checkInDate = new Date(request.checkIn);
+      const checkOutDate = new Date(request.checkOut);
+      const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+      
       // Sum all room type final prices for each confirmed offering
-      const offeringTotal = (offering.final_price_double || 0) + 
-                           (offering.final_price_triple || 0) + 
-                           (offering.final_price_quad || 0) + 
-                           (offering.final_price_quint || 0);
+      const dailyTotal = (offering.final_price_double || 0) + 
+                        (offering.final_price_triple || 0) + 
+                        (offering.final_price_quad || 0) + 
+                        (offering.final_price_quint || 0);
+      
+      const offeringTotal = dailyTotal * nights;
       totalAmount += offeringTotal;
-      console.log(`Request ${request.id.slice(-6)}: Offering total = $${offeringTotal}`);
+      console.log(`Request ${request.id.slice(-6)}: Daily rate = $${dailyTotal}, Nights = ${nights}, Total = $${offeringTotal}`);
     } else {
       console.log(`Request ${request.id.slice(-6)}: No confirmed offering found`);
     }
