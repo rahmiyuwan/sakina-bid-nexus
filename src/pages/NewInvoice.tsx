@@ -22,21 +22,6 @@ const NewInvoice = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
-  // Only allow admin and super_admin access
-  if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
-    return (
-      <MainLayout>
-        <div className="container mx-auto p-6">
-          <Card>
-            <CardContent className="text-center p-8">
-              <p className="text-muted-foreground">Access denied. This page is only available to administrators.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </MainLayout>
-    );
-  }
-
   useEffect(() => {
     refreshRequests();
   }, []);
@@ -56,6 +41,21 @@ const NewInvoice = () => {
       setSelectedRequests([]);
     }
   }, [selectedWorkspace, requests]);
+
+  // Only allow admin and super_admin access
+  if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto p-6">
+          <Card>
+            <CardContent className="text-center p-8">
+              <p className="text-muted-foreground">Access denied. This page is only available to administrators.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </MainLayout>
+    );
+  }
 
   const handleRequestSelection = (requestId: string, checked: boolean) => {
     if (checked) {
