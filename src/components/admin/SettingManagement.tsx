@@ -121,8 +121,67 @@ const SettingManagement: React.FC = () => {
     return <div>Loading settings...</div>;
   }
 
+  const defaultMarginSetting = settings.find(s => s.key === 'default_margin');
+  const [defaultMargin, setDefaultMargin] = useState(defaultMarginSetting?.value || '10');
+
+  const handleUpdateDefaultMargin = async () => {
+    try {
+      if (defaultMarginSetting) {
+        await settingService.update(defaultMarginSetting.id, {
+          ...defaultMarginSetting,
+          value: defaultMargin
+        });
+      } else {
+        await settingService.create({
+          key: 'default_margin',
+          value: defaultMargin,
+          value_type: 'decimal',
+          description: 'Default margin value for offerings',
+          category: 'commission',
+          is_active: true
+        });
+      }
+      toast({
+        title: "Success",
+        description: "Default margin updated successfully"
+      });
+      refreshSettings();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update default margin",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Default Margin Setting */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Default Margin Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end space-x-4">
+            <div className="flex-1">
+              <Label htmlFor="default-margin">Default Margin (SAR)</Label>
+              <Input
+                id="default-margin"
+                type="number"
+                step="0.01"
+                value={defaultMargin}
+                onChange={(e) => setDefaultMargin(e.target.value)}
+                placeholder="10"
+              />
+            </div>
+            <Button onClick={handleUpdateDefaultMargin}>
+              Update Default Margin
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Setting Management</h2>
         <Dialog open={dialogOpen} onOpenChange={(open) => {

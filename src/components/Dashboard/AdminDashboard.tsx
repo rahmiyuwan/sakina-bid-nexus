@@ -222,9 +222,14 @@ const AdminDashboard: React.FC = () => {
                         <p className="text-sm text-muted-foreground">
                           Request: {request?.travelName} • {request?.city}
                         </p>
-                        <Badge className={`${getStatusColor(offering.status)} mt-1`}>
-                          {offering.status}
-                        </Badge>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge className={`${getStatusColor(offering.status)}`}>
+                            {offering.status}
+                          </Badge>
+                          <Badge className={`${getStatusColor(request?.status || '')}`}>
+                            Request: {request?.status}
+                          </Badge>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">Current Margin: {offering.admin_margin} SAR</p>
@@ -276,7 +281,7 @@ const AdminDashboard: React.FC = () => {
                         variant="secondary" 
                         size="sm"
                         onClick={() => handleMarginUpdate(offering.id)}
-                        disabled={!marginEdits[offering.id] || offering.status === 'CONFIRMED'}
+                        disabled={!marginEdits[offering.id] || request?.status !== 'Submitted'}
                       >
                         Update
                       </Button>

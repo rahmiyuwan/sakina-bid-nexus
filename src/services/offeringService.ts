@@ -87,9 +87,22 @@ export const offeringService = {
   },
 
   async create(offering: CreateOffering): Promise<HotelOffering> {
+    // Get default margin from settings if not provided
+    let finalOffering = { ...offering };
+    if (!finalOffering.admin_margin) {
+      const { data: defaultMarginSetting } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'default_margin')
+        .eq('is_active', true)
+        .single();
+      
+      finalOffering.admin_margin = defaultMarginSetting ? parseFloat(defaultMarginSetting.value) : 10;
+    }
+
     const { data, error } = await supabase
       .from('offerings')
-      .insert(offering)
+      .insert(finalOffering)
       .select(`
         *,
         request:requests!request_id(*),
